@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby '2.2.1'
+
 gem 'rack', '~> 1.5.2'
 gem 'puma'
 gem 'grape', '~> 0.9.0'
