@@ -1,6 +1,15 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    actionpack (4.1.12)
+      actionview (= 4.1.12)
+      activesupport (= 4.1.12)
+      rack (~> 1.5.2)
+      rack-test (~> 0.6.2)
+    actionview (4.1.12)
+      activesupport (= 4.1.12)
+      builder (~> 3.1)
+      erubis (~> 2.7.0)
     activemodel (4.1.12)
       activesupport (= 4.1.12)
       builder (~> 3.1)
@@ -26,6 +35,7 @@ GEM
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     equalizer (0.0.11)
+    erubis (2.7.0)
     grape (0.9.0)
       activesupport
       builder
@@ -46,6 +56,9 @@ GEM
     i18n (0.7.0)
     ice_nine (0.11.1)
     json (1.8.3)
+    kaminari (0.16.3)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
     method_source (0.8.2)
     minitest (5.7.0)
     multi_json (1.11.2)
@@ -62,6 +75,8 @@ GEM
       rack (>= 0.4)
     rack-mount (0.8.3)
       rack (>= 1.0.0)
+    rack-test (0.6.3)
+      rack (>= 1.0)
     rake (10.4.2)
     slop (3.6.0)
     thread_safe (0.3.5)
@@ -80,6 +95,7 @@ DEPENDENCIES
   activerecord (~> 4.1.6)
   grape (~> 0.9.0)
   grape-activerecord
+  kaminari
   pg
   pry
   puma

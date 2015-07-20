@@ -1,10 +1,10 @@
 module ApplicationHelper
-  def zip_codes_response(zip_codes)
+  def zip_codes_response(zip_codes, options = {})
     {
       zip_codes: zip_codes.map { |zip_code|
         zip_code_response(zip_code)
       }
-    }
+    }.merge(options)
   end
 
   def zip_code_response(zip_code)
@@ -26,5 +26,9 @@ module ApplicationHelper
       d_zona: zip_code.d_zona,
       c_cve_ciudad: zip_code.c_cve_ciudad
     }
+  end
+
+  def pagination_json(paginated_array, per_page)
+    { pagination: { per_page: per_page.to_i, total_pages: paginated_array.total_pages, total_objects: paginated_array.total_count } }
   end
 end

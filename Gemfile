@@ -8,3 +8,5 @@ gem 'grape-activerecord'
 gem 'pg'
 gem 'rake'
 gem 'pry'
+gem 'kaminari', :require => 'kaminari/grape'
+
