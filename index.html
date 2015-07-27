@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Sepomex by IcaliaLabs</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Sepomex</h1>
+        <h2>A REST API for the SEPOMEX database</h2>
+        <a href="https://github.com/IcaliaLabs/sepomex" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="sepomex" class="anchor" href="#sepomex" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="https://github.com/IcaliaLabs/sepomex">Sepomex</a>
+</h1>
+
+<p>Sepomex is a REST API that maps all the data from the current zip codes in Mexico. You can get the CSV or Excel files from the <a href="http://www.sepomex.gob.mx/lservicios/servicios/CodigoPostal_Exportar.aspx">official site</a></p>
+
+<p>We build this API in order to provide a way to developers query the zip codes, as we had faced the problem if importing data like this in many projects.</p>
+
+<h2>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of contents</h2>
+
+<ul>
+<li><a href="#quick-start">Quick start</a></li>
+<li><a href="#contributing">Contributing</a></li>
+<li><a href="#heroes">Heroes</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick start</h2>
+
+<p>The URL to start consuming the JSON response is under:</p>
+
+<pre><code>http://sepomex-api.herokuapp.com/api/v1/zip_codes
+</code></pre>
+
+<p>There are currently <code>145,481</code> records on the database which were extracted from the <a href="https://github.com/IcaliaLabs/sepomex/blob/master/lib/support/sepomex_db.csv">CSV file</a> included in the project.</p>
+
+<p>Records are paginated with <strong>50</strong> records per page.</p>
+
+<h3>
+<a id="running-the-project" class="anchor" href="#running-the-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the project</h3>
+
+<p>To run the api locally you can follow the next steps:</p>
+
+<ol>
+<li>First clone the project <code>git clone https://github.com/IcaliaLabs/sepomex.git</code>
+</li>
+<li>Under the <code>sepomex</code> directory run the <code>bundle install</code> command to download all the dependencies</li>
+<li>Set up the <code>database.yml</code> to meet your requirements and create it</li>
+<li>Migrate the database, <code>rake db:migrate</code>
+</li>
+<li>We have provided a rake task to migrate the CSV data: <code>rake db:migrate:zip_codes</code>
+</li>
+<li>Lift the server <code>foreman start</code> or <code>bundle exec rackup config.ru</code>
+</li>
+<li>The path for the api is: <code>/api/v1/zip_codes</code>
+</li>
+</ol>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>Please submit all pull requests against a separate branch. Please follow the standard for naming the variables, mixins, etc.</p>
+
+<p>In case you are wondering what to attack, we hnow have a milestone with the version to work, some fixes and refactors. Feel free to start one.</p>
+
+<p>Thanks!</p>
+
+<h2>
+<a id="heroes" class="anchor" href="#heroes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Heroes</h2>
+
+<p><strong>Abraham Kuri</strong></p>
+
+<ul>
+<li><a href="http://twitter.com/kurenn">http://twitter.com/kurenn</a></li>
+<li><a href="http://github.com/kurenn">http://github.com/kurenn</a></li>
+<li><a href="http://klout.com/#/kurenn">http://klout.com/#/kurenn</a></li>
+</ul>
+
+<h2>
+<a id="copyright-and-license" class="anchor" href="#copyright-and-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copyright and license</h2>
+
+<p>Code and documentation copyright 2013-2014 Icalia Labs. Code released under <a href="LICENSE">the MIT license</a>.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/IcaliaLabs/sepomex/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/IcaliaLabs/sepomex/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/IcaliaLabs/sepomex"></a> is maintained by <a href="https://github.com/IcaliaLabs">IcaliaLabs</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
