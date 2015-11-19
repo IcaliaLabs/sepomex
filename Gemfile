@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.2.1'
+ruby '2.2.3'
 
 gem 'rack', '~> 1.5.2'
 gem 'puma'
@@ -11,4 +11,4 @@ gem 'pg'
 gem 'rake'
 gem 'pry'
 gem 'kaminari', :require => 'kaminari/grape'
-
+gem 'rack-cors', :require => 'rack/cors'
