@@ -11,4 +11,4 @@ gem 'pg'
 gem 'rake'
 gem 'pry'
 gem 'kaminari', :require => 'kaminari/grape'
-
+gem 'rack-cors', :require => 'rack/cors'
