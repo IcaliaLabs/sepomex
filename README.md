@@ -7,6 +7,7 @@ We build this API in order to provide a way to developers query the zip codes, a
 
 ## Table of contents
 - [Quick start](#quick-start)
+- [Querying the API](#querying-the-api)
 - [Contributing](#contributing)
 - [Heroes](#heroes)
 - [License](#license)
@@ -34,6 +35,43 @@ To run the api locally you can follow the next steps:
 5. We have provided a rake task to migrate the CSV data: `rake db:migrate:zip_codes`
 6. Lift the server `foreman start` or `bundle exec rackup config.ru`
 7. The path for the api is: `/api/v1/zip_codes`
+
+## Querying the API
+
+In order to provide more flexibility to search a zip code, whether is by city, colony, state or zip code you can now send multiple parameters to make the appropiate search:
+
+#### by city
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d city=monterrey
+```
+
+#### by state
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d state=nuevo%20leon
+```
+
+#### by colony
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d colony=punta%20contry
+```
+
+#### by cp
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d cp=67173
+```
+
+#### all together
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes \
+-d colony=punta%20contry \
+-d state=nuevo%20leon \
+-d city=guadalupe
+```
 
 ## Contributing
 
