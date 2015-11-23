@@ -73,6 +73,8 @@ curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes \
 -d city=guadalupe
 ```
 
+**Note: A link for the json attributes description is provided [here](http://www.sepomex.gob.mx/lservicios/servicios/imagenes/Descrip.pdf)**
+
 ## Contributing
 
 Please submit all pull requests against a separate branch. Please follow the standard for naming the variables, mixins, etc.
