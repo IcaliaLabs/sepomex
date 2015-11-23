@@ -12,5 +12,7 @@ map '/api' do
     end
   end
 
+  use ActiveRecord::ConnectionAdapters::ConnectionManagement
+
   run Sepomex
 end
