@@ -14,5 +14,10 @@ module API
       states = State.page(params[:page]).per(50)
       render states, meta: pagination_json(states, 50)
     end
+
+    get :municipalities do
+      municipalities = Municipality.search(params).page(params[:page]).per(50)
+      render municipalities, meta: pagination_json(municipalities, 50)
+    end
   end
 end

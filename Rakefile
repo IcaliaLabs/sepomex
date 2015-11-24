@@ -53,4 +53,23 @@ namespace :db do
       puts "Done!"
     end
   end
+
+  namespace :migrate do
+    desc "Migrates the municipalities from the zip codes"
+    task :municipalities => :environment do
+      puts "Creating municipalities..."
+
+      states = State.all
+      states.each do |state|
+        municipalities = ZipCode.where(d_estado: state.name)
+
+        municipalities.each do |municipality|
+          state.municipalities.create(name: municipality.d_mnpio, municipality_key: municipality.c_mnpio, zip_code: municipality.d_cp)
+        end
+
+      end
+      puts "Done!"
+
+    end
+  end
 end
