@@ -10,6 +10,8 @@ GEM
       activesupport (= 4.1.12)
       builder (~> 3.1)
       erubis (~> 2.7.0)
+    active_model_serializers (0.9.3)
+      activemodel (>= 3.2)
     activemodel (4.1.12)
       activesupport (= 4.1.12)
       builder (~> 3.1)
@@ -46,6 +48,9 @@ GEM
       rack-accept
       rack-mount
       virtus (>= 1.0.0)
+    grape-active_model_serializers (1.3.2)
+      active_model_serializers (>= 0.9.0)
+      grape
     grape-activerecord (0.0.8)
       activerecord (~> 4.0)
       grape (~> 0.1)
@@ -95,6 +100,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 4.1.6)
   grape (~> 0.9.0)
+  grape-active_model_serializers
   grape-activerecord
   kaminari
   pg

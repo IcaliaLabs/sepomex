@@ -37,4 +37,20 @@ namespace :db do
       puts "Done!"
     end
   end
+
+  namespace :migrate do
+    desc "Migrates the states from the zip codes"
+    task :states => :environment do
+      puts "Creating states..."
+
+      state_names = ZipCode.pluck(:d_estado).uniq
+      state_names.each do |state_name|
+
+        cities_count = ZipCode.where(d_estado: state_name).pluck(:d_mnpio).uniq.count
+
+        State.create(name: state_name, cities_count: cities_count)
+      end
+      puts "Done!"
+    end
+  end
 end
