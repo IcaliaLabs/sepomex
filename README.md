@@ -2,7 +2,7 @@
 
 Sepomex is a REST API that maps all the data from the current zip codes in Mexico. You can get the CSV or Excel files from the [official site](http://www.sepomex.gob.mx/lservicios/servicios/CodigoPostal_Exportar.aspx)
 
-We build this API in order to provide a way to developers query the zip codes, as we had faced the problem if importing data like this in many projects.
+We build this API in order to provide a way to developers query the zip codes, states and municipalities across the country.
 
 
 ## Table of contents
@@ -14,10 +14,10 @@ We build this API in order to provide a way to developers query the zip codes, a
 
 ## Quick start
 
-The URL to start consuming the JSON response is under:
+The base URI to start consuming the JSON response is under:
 
 ```
-http://sepomex-api.herokuapp.com/api/v1/zip_codes
+https://sepomex-api.herokuapp.com/api/v1/
 ```
 
 There are currently `145,481` records on the database which were extracted from the [CSV file](https://github.com/IcaliaLabs/sepomex/blob/master/lib/support/sepomex_db.csv) included in the project.
@@ -26,19 +26,41 @@ Records are paginated with **50** records per page.
 
 ### Running the project
 
+#### Prerequisites
+
+1. Install the `foreman` gem with:
+
+```console
+% gem install foreman
+```
+
 To run the api locally you can follow the next steps:
+
+1. First clone the project `git clone https://github.com/IcaliaLabs/sepomex.git`
+2. Run the `bin/setup` script
+3. Lift the server `foreman start`
+
+Or by hand
 
 1. First clone the project `git clone https://github.com/IcaliaLabs/sepomex.git`
 2. Under the `sepomex` directory run the `bundle install` command to download all the dependencies
 3. Set up the `database.yml` to meet your requirements and create it
 4. Migrate the database, `rake db:migrate`
 5. We have provided a rake task to migrate the CSV data: `rake db:migrate:zip_codes`
-6. Lift the server `foreman start` or `bundle exec rackup config.ru`
-7. The path for the api is: `/api/v1/zip_codes`
+6. Lift the server `foreman start`
 
 ## Querying the API
 
-In order to provide more flexibility to search a zip code, whether is by city, colony, state or zip code you can now send multiple parameters to make the appropiate search:
+We currently provide 3 kind of resources, **zip_codes**, **states** and
+**municipalities**:
+
+| ZipCodes  	| States  	| Municipalities |
+|---	|---	|---	|
+|  https://sepomex-api.herokuapp.com/api/v1/zip_codes  	|  https://sepomex-api.herokuapp.com/api/v1/states  	|   https://sepomex-api.herokuapp.com/api/v1/municipalities 	|
+
+### ZipCodes
+
+In order to provide more flexibility to search a zip code, whether is by city, colony, state or zip code you can now send multiple parameters to make the appropiate search. You can fetch the:
 
 #### by city
 
@@ -61,7 +83,7 @@ curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d colony=punta%2
 #### by cp
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d cp=67173
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d zip_code=67173
 ```
 
 #### all together
@@ -75,13 +97,55 @@ curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes \
 
 **Note: A link for the json attributes description is provided [here](http://www.sepomex.gob.mx/lservicios/servicios/imagenes/Descrip.pdf)**
 
+### States
+
+The `states` resources can be fetch through several means:
+
+#### all
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/states
+```
+
+#### by id
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1
+```
+
+#### states municipalities
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1/municipalities
+```
+
+### Municipalities
+
+#### all
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities
+```
+
+#### by id
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities/1
+```
+
+### by zip_code
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities -d zip_code=67173
+```
+
 ## Contributing
 
-Please submit all pull requests against a separate branch. Please follow the standard for naming the variables, mixins, etc.
+Please submit all pull requests against a separate branch.
 
-In case you are wondering what to attack, we hnow have a milestone with the version to work, some fixes and refactors. Feel free to start one.
+### Code of conduct
 
-Thanks!
+This project adheres to the [Contributor Covenant 1.2](http://contributor-covenant.org/version/1/2/0/). By participating, you are expected to honor this code. 
 
 ## Heroes
 
@@ -94,4 +158,4 @@ Thanks!
 
 ## Copyright and license
 
-Code and documentation copyright 2013-2014 Icalia Labs. Code released under [the MIT license](LICENSE).
+Code and documentation copyright 2013-2015 Icalia Labs. Code released under [the MIT license](LICENSE).
