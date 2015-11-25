@@ -1,46 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <meta charset="UTF-8">
+    <title>Sepomex by IcaliaLabs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <title>Sepomex by IcaliaLabs</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>Sepomex</h1>
-        <h2>A REST API for the SEPOMEX database</h2>
-        <a href="https://github.com/IcaliaLabs/sepomex" class="button"><small>View project on</small> GitHub</a>
-      </div>
-    </header>
+    <section class="page-header">
+      <h1 class="project-name">Sepomex</h1>
+      <h2 class="project-tagline">A REST API for the SEPOMEX database</h2>
+      <a href="https://github.com/IcaliaLabs/sepomex" class="btn">View on GitHub</a>
+      <a href="https://github.com/IcaliaLabs/sepomex/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/IcaliaLabs/sepomex/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
+    <section class="main-content">
+      <h1>
 <a id="sepomex" class="anchor" href="#sepomex" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="https://github.com/IcaliaLabs/sepomex">Sepomex</a>
 </h1>
 
 <p>Sepomex is a REST API that maps all the data from the current zip codes in Mexico. You can get the CSV or Excel files from the <a href="http://www.sepomex.gob.mx/lservicios/servicios/CodigoPostal_Exportar.aspx">official site</a></p>
 
-<p>We build this API in order to provide a way to developers query the zip codes, as we had faced the problem if importing data like this in many projects.</p>
+<p>We build this API in order to provide a way to developers query the zip codes, states and municipalities across the country.</p>
 
 <h2>
 <a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of contents</h2>
 
 <ul>
 <li><a href="#quick-start">Quick start</a></li>
+<li><a href="#querying-the-api">Querying the API</a></li>
 <li><a href="#contributing">Contributing</a></li>
 <li><a href="#heroes">Heroes</a></li>
 <li><a href="#license">License</a></li>
@@ -49,9 +41,9 @@
 <h2>
 <a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick start</h2>
 
-<p>The URL to start consuming the JSON response is under:</p>
+<p>The base URI to start consuming the JSON response is under:</p>
 
-<pre><code>http://sepomex-api.herokuapp.com/api/v1/zip_codes
+<pre><code>https://sepomex-api.herokuapp.com/api/v1/
 </code></pre>
 
 <p>There are currently <code>145,481</code> records on the database which were extracted from the <a href="https://github.com/IcaliaLabs/sepomex/blob/master/lib/support/sepomex_db.csv">CSV file</a> included in the project.</p>
@@ -61,7 +53,26 @@
 <h3>
 <a id="running-the-project" class="anchor" href="#running-the-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the project</h3>
 
+<h4>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h4>
+
+<ol>
+<li>Install the <code>foreman</code> gem with:</li>
+</ol>
+
+<div class="highlight highlight-text-shell-session"><pre>% <span class="pl-s1">gem install foreman</span></pre></div>
+
 <p>To run the api locally you can follow the next steps:</p>
+
+<ol>
+<li>First clone the project <code>git clone https://github.com/IcaliaLabs/sepomex.git</code>
+</li>
+<li>Run the <code>bin/setup</code> script</li>
+<li>Lift the server <code>foreman start</code>
+</li>
+</ol>
+
+<p>Or by hand</p>
 
 <ol>
 <li>First clone the project <code>git clone https://github.com/IcaliaLabs/sepomex.git</code>
@@ -72,20 +83,115 @@
 </li>
 <li>We have provided a rake task to migrate the CSV data: <code>rake db:migrate:zip_codes</code>
 </li>
-<li>Lift the server <code>foreman start</code> or <code>bundle exec rackup config.ru</code>
-</li>
-<li>The path for the api is: <code>/api/v1/zip_codes</code>
+<li>Lift the server <code>foreman start</code>
 </li>
 </ol>
 
 <h2>
+<a id="querying-the-api" class="anchor" href="#querying-the-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Querying the API</h2>
+
+<p>We currently provide 3 kind of resources, <strong>zip_codes</strong>, <strong>states</strong> and
+<strong>municipalities</strong>:</p>
+
+<table>
+<thead>
+<tr>
+<th>ZipCodes</th>
+<th>States</th>
+<th>Municipalities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://sepomex-api.herokuapp.com/api/v1/zip_codes">https://sepomex-api.herokuapp.com/api/v1/zip_codes</a></td>
+<td><a href="https://sepomex-api.herokuapp.com/api/v1/states">https://sepomex-api.herokuapp.com/api/v1/states</a></td>
+<td><a href="https://sepomex-api.herokuapp.com/api/v1/municipalities">https://sepomex-api.herokuapp.com/api/v1/municipalities</a></td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="zipcodes" class="anchor" href="#zipcodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>ZipCodes</h3>
+
+<p>In order to provide more flexibility to search a zip code, whether is by city, colony, state or zip code you can now send multiple parameters to make the appropiate search. You can fetch the:</p>
+
+<h4>
+<a id="by-city" class="anchor" href="#by-city" aria-hidden="true"><span class="octicon octicon-link"></span></a>by city</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d city=monterrey</pre></div>
+
+<h4>
+<a id="by-state" class="anchor" href="#by-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>by state</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d state=nuevo%20leon</pre></div>
+
+<h4>
+<a id="by-colony" class="anchor" href="#by-colony" aria-hidden="true"><span class="octicon octicon-link"></span></a>by colony</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d colony=punta%20contry</pre></div>
+
+<h4>
+<a id="by-cp" class="anchor" href="#by-cp" aria-hidden="true"><span class="octicon octicon-link"></span></a>by cp</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d zip_code=67173</pre></div>
+
+<h4>
+<a id="all-together" class="anchor" href="#all-together" aria-hidden="true"><span class="octicon octicon-link"></span></a>all together</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes \
+-d colony=punta%20contry \
+-d state=nuevo%20leon \
+-d city=guadalupe</pre></div>
+
+<p><strong>Note: A link for the json attributes description is provided <a href="http://www.sepomex.gob.mx/lservicios/servicios/imagenes/Descrip.pdf">here</a></strong></p>
+
+<h3>
+<a id="states" class="anchor" href="#states" aria-hidden="true"><span class="octicon octicon-link"></span></a>States</h3>
+
+<p>The <code>states</code> resources can be fetch through several means:</p>
+
+<h4>
+<a id="all" class="anchor" href="#all" aria-hidden="true"><span class="octicon octicon-link"></span></a>all</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/states</pre></div>
+
+<h4>
+<a id="by-id" class="anchor" href="#by-id" aria-hidden="true"><span class="octicon octicon-link"></span></a>by id</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1</pre></div>
+
+<h4>
+<a id="states-municipalities" class="anchor" href="#states-municipalities" aria-hidden="true"><span class="octicon octicon-link"></span></a>states municipalities</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1/municipalities</pre></div>
+
+<h3>
+<a id="municipalities" class="anchor" href="#municipalities" aria-hidden="true"><span class="octicon octicon-link"></span></a>Municipalities</h3>
+
+<h4>
+<a id="all-1" class="anchor" href="#all-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>all</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities</pre></div>
+
+<h4>
+<a id="by-id-1" class="anchor" href="#by-id-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>by id</h4>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities/1</pre></div>
+
+<h3>
+<a id="by-zip_code" class="anchor" href="#by-zip_code" aria-hidden="true"><span class="octicon octicon-link"></span></a>by zip_code</h3>
+
+<div class="highlight highlight-source-shell"><pre>curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities -d zip_code=67173</pre></div>
+
+<h2>
 <a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
-<p>Please submit all pull requests against a separate branch. Please follow the standard for naming the variables, mixins, etc.</p>
+<p>Please submit all pull requests against a separate branch.</p>
 
-<p>In case you are wondering what to attack, we hnow have a milestone with the version to work, some fixes and refactors. Feel free to start one.</p>
+<h3>
+<a id="code-of-conduct" class="anchor" href="#code-of-conduct" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code of conduct</h3>
 
-<p>Thanks!</p>
+<p>This project adheres to the <a href="http://contributor-covenant.org/version/1/2/0/">Contributor Covenant 1.2</a>. By participating, you are expected to honor this code. </p>
 
 <h2>
 <a id="heroes" class="anchor" href="#heroes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Heroes</h2>
@@ -101,25 +207,15 @@
 <h2>
 <a id="copyright-and-license" class="anchor" href="#copyright-and-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copyright and license</h2>
 
-<p>Code and documentation copyright 2013-2014 Icalia Labs. Code released under <a href="LICENSE">the MIT license</a>.</p>
-        </section>
+<p>Code and documentation copyright 2013-2015 Icalia Labs. Code released under <a href="LICENSE">the MIT license</a>.</p>
 
-        <aside id="sidebar">
-          <a href="https://github.com/IcaliaLabs/sepomex/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/IcaliaLabs/sepomex/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/IcaliaLabs/sepomex">Sepomex</a> is maintained by <a href="https://github.com/IcaliaLabs">IcaliaLabs</a>.</span>
 
-          <p class="repo-owner"><a href="https://github.com/IcaliaLabs/sepomex"></a> is maintained by <a href="https://github.com/IcaliaLabs">IcaliaLabs</a>.</p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
-    </div>
+    </section>
 
   
   </body>
