@@ -1,6 +1,6 @@
 require './config/env'
 require './sepomex'
-
+require 'grape-active_model_serializers'
 
 map '/api' do
   use Rack::Cors do

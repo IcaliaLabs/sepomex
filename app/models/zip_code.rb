@@ -1,7 +1,7 @@
 class ZipCode < ActiveRecord::Base
   default_scope { order(:id) }
 
-  scope :find_by_cp, lambda { |cp|
+  scope :find_by_zip_code, lambda { |cp|
     where("d_codigo ILIKE ?", "%#{cp}%")
   }
 
@@ -20,7 +20,7 @@ class ZipCode < ActiveRecord::Base
   def self.search(params = {})
     zip_codes = all
 
-    zip_codes = zip_codes.find_by_cp(params[:cp]) if params[:cp].present?
+    zip_codes = zip_codes.find_by_zip_code(params[:cp] || params[:zip_code]) if params[:cp].present?  || params[:zip_code].present?
     zip_codes = zip_codes.find_by_state(params[:state]) if params[:state].present?
     zip_codes = zip_codes.find_by_city(params[:city]) if params[:city].present?
     zip_codes = zip_codes.find_by_colony(params[:colony]) if params[:colony].present?

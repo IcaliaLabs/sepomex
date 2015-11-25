@@ -11,11 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151123171934) do
+ActiveRecord::Schema.define(version: 20151124160008) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "unaccent"
+
+  create_table "municipalities", force: true do |t|
+    t.string  "name",             null: false
+    t.string  "municipality_key", null: false
+    t.string  "zip_code",         null: false
+    t.integer "state_id"
+  end
+
+  add_index "municipalities", ["state_id"], name: "index_municipalities_on_state_id", using: :btree
+
+  create_table "states", force: true do |t|
+    t.string  "name",         null: false
+    t.integer "cities_count", null: false
+  end
 
   create_table "zip_codes", force: true do |t|
     t.string   "d_codigo",         null: false
