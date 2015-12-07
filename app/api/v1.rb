@@ -22,7 +22,8 @@ module API
 
       get ":id/municipalities", root: "municipalities" do
         state = State.find(params[:id])
-        state.municipalities.order(:id)
+        municipalities = state.municipalities.page(params[:page]).per(50).order(:id)
+        render municipalities, meta: pagination_json(municipalities, 50)
       end
 
     end
@@ -35,7 +36,7 @@ module API
         render municipalities, meta: pagination_json(municipalities, 50)
       end
 
-      get ":id" do
+      get ":id", root: "municipality" do
         Municipality.find(params[:id])
       end
 
