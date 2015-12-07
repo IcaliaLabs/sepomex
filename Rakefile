@@ -1,3 +1,4 @@
+#encoding: utf-8
 require 'bundler/setup'
 require 'grape/activerecord/rake'
 require 'csv'
@@ -5,7 +6,7 @@ require 'pry'
 
 namespace :db do
   task :environment do
-    require './config/env'
+    require_relative 'config/env'
   end
 end
 
@@ -19,7 +20,7 @@ namespace :db do
 
       inserts = []
       ActiveRecord::Base.transaction do
-        CSV.foreach("./lib/support/sepomex_db.csv", col_sep: "|") do |row|
+        CSV.foreach("./lib/support/sepomex_db.csv", col_sep: "|", :encoding => 'UTF-8') do |row|
           inserts << "(#{row.map {|field| "'#{field}'"}.join(', ')})"
         end
 
@@ -72,4 +73,7 @@ namespace :db do
 
     end
   end
+
+  desc "Populates the database"
+  task populate_db: ['db:migrate:zip_codes', 'db:migrate:states', 'db:migrate:municipalities']
 end

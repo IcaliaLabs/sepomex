@@ -1,0 +1,26 @@
+postgres:
+  image: postgres:9.4.5
+  ports: [ "5432:5432" ]
+  volumes:
+    - "./db/init:/docker-entrypoint-initdb.d"
+  environment:
+    POSTGRES_PASSWORD: s3p0m3x!
+
+gems: &app_base
+  image: ruby:2.2.3
+  volumes:
+    - ".:/usr/src/app"
+    - "/usr/local/bundle"
+  working_dir: /usr/src/app
+  environment:
+    DATABASE_URL: postgres://postgres:s3p0m3x!@postgres.sepomex.com:5432/sepomex_development?pool=5&encoding=unicode&schema_search_path=public,partitioning
+  links:
+    - postgres:postgres.sepomex.com
+
+web: &app
+  <<: *app_base
+  stdin_open: true
+  entrypoint: /usr/src/app/dev-entrypoint.sh
+  volumes_from: ["gems"]
+  command: rackup -p 3000 --host 0.0.0.0
+  ports: [ "3000:3000" ]
