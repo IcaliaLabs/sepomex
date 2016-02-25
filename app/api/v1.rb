@@ -28,7 +28,6 @@ module API
 
     end
 
-
     namespace :municipalities do
 
       get "/" do
@@ -38,6 +37,18 @@ module API
 
       get ":id", root: "municipality" do
         Municipality.find(params[:id])
+      end
+
+    end
+
+    namespace :cities do
+
+      get "/" do
+        cities = City.page(params[:page]).per(50)
+      end
+
+      get ":id", root: "city" do
+        City.find(params[:id])
       end
 
     end
