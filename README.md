@@ -51,12 +51,13 @@ Or by hand
 
 ## Querying the API
 
-We currently provide 3 kind of resources, **zip_codes**, **states** and
-**municipalities**:
+We currently provide 4 kind of resources: 
 
-| ZipCodes  	| States  	| Municipalities |
-|---	|---	|---	|
-|  https://sepomex-api.herokuapp.com/api/v1/zip_codes  	|  https://sepomex-api.herokuapp.com/api/v1/states  	|   https://sepomex-api.herokuapp.com/api/v1/municipalities 	|
+* **Zip Codes**: [https://sepomex-api.herokuapp.com/api/v1/zip_codes](https://sepomex-api.herokuapp.com/api/v1/zip_codes)
+* **States**: [https://sepomex-api.herokuapp.com/api/v1/states](https://sepomex-api.herokuapp.com/api/v1/states)
+* **Municipalities**: [https://sepomex-api.herokuapp.com/api/v1/municipalities](https://sepomex-api.herokuapp.com/api/v1/municipalities)
+* **Cities**: [https://sepomex-api.herokuapp.com/api/v1/cities](https://sepomex-api.herokuapp.com/api/v1/cities)
+
 
 ### ZipCodes
 
@@ -133,11 +134,28 @@ curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities
 curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities/1
 ```
 
-### by zip_code
+#### by zip_code
 
 ```bash
 curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities -d zip_code=67173
 ```
+
+### Cities
+
+#### all
+
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/cities
+```
+
+#### by id
+
+
+```bash
+curl -X GET https://sepomex-api.herokuapp.com/api/v1/cities/1
+```
+
 
 ## Contributing
 
@@ -158,4 +176,4 @@ This project adheres to the [Contributor Covenant 1.2](http://contributor-covena
 
 ## Copyright and license
 
-Code and documentation copyright 2013-2015 Icalia Labs. Code released under [the MIT license](LICENSE).
+Code and documentation copyright 2013-2016 Icalia Labs. Code released under [the MIT license](LICENSE).

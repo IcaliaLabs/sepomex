@@ -74,6 +74,24 @@ namespace :db do
     end
   end
 
+  namespace :migrate do
+    desc "Migrates the cities from the zip codes" 
+    task cities: :environment do
+      puts "Creating cities..."
+
+      states = State.all
+      states.each do |state|
+        zip_codes_by_state = ZipCode.where(d_estado: state.name)
+
+        zip_codes_by_state.each do |zip_code|
+          next if City.find_by_name(zip_code.d_ciudad)
+          state.cities.create(name: zip_code.d_ciudad)
+        end
+      end
+      puts "Done!"
+    end
+  end
+
   desc "Populates the database"
-  task populate_db: ['db:migrate:zip_codes', 'db:migrate:states', 'db:migrate:municipalities']
+  task populate_db: ['db:migrate:zip_codes', 'db:migrate:states', 'db:migrate:municipalities', 'db:migrate:cities']
 end
