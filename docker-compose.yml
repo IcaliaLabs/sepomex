@@ -1,26 +1,41 @@
-postgres:
-  image: postgres:9.4.5
-  ports: [ "5432:5432" ]
-  volumes:
-    - "./db/init:/docker-entrypoint-initdb.d"
-  environment:
-    POSTGRES_PASSWORD: s3p0m3x!
+version: "2"
 
-gems: &app_base
-  image: ruby:2.2.3
-  volumes:
-    - ".:/usr/src/app"
-    - "/usr/local/bundle"
-  working_dir: /usr/src/app
-  environment:
-    DATABASE_URL: postgres://postgres:s3p0m3x!@postgres.sepomex.com:5432/sepomex_development?pool=5&encoding=unicode&schema_search_path=public,partitioning
-  links:
-    - postgres:postgres.sepomex.com
+volumes:
+  gems:
+    driver: local
+  postgres-data:
+    driver: local
 
-web: &app
-  <<: *app_base
-  stdin_open: true
-  entrypoint: /usr/src/app/dev-entrypoint.sh
-  volumes_from: ["gems"]
-  command: rackup -p 3000 --host 0.0.0.0
-  ports: [ "3000:3000" ]
+services:
+  db:
+    image: postgres:9.5
+    volumes:
+      - "./db/init:/docker-entrypoint-initdb.d"
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: s3p0m3x!
+    restart: always
+    #entrypoint: /docker-entrypoint-initdb.d/init_db.sh
+  web:
+    image: ruby:2.2.3
+    #entrypoint: /usr/src/app/dev-entrypoint.sh
+    volumes:
+      - .:/usr/src/app
+      - gems:/usr/local/bundle
+    working_dir: /usr/src/app
+    # Keep the stdin open, so we can attach to our app container's process
+    # and do things such as byebug, etc:
+    stdin_open: true
+    # Enable sending signals (CTRL+C, CTRL+P + CTRL+Q) into the container:
+    tty: true
+    links:
+      - db
+    command: rackup -p 3000 --host 0.0.0.0
+    ports:
+      - 3000:3000
+    restart: always
+    entrypoint: /usr/src/app/dev-entrypoint.sh
+    environment:
+      # We'll overwrite the PATH environment variable to include the 'bin/'
+      # directory, for the entrypoint script to find the app's executables:
+      DATABASE_URL: "postgres://postgres:s3p0m3x!@db:5432/sepomex_development?pool=5&encoding=unicode&schema_search_path=public,partitioning"
