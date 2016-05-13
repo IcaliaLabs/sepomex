@@ -10,7 +10,8 @@ class ZipCode < ActiveRecord::Base
   }
 
   scope :find_by_city, lambda { |city|
-    unaccent("d_ciudad", city)
+    where("unaccent(d_ciudad) ILIKE unaccent(?)
+          OR unaccent(d_mnpio) ILIKE unaccent(?)", "%#{city}%", "%#{city}%")
   }
 
   scope :find_by_colony, lambda { |colony|
