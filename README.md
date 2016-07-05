@@ -1,3 +1,7 @@
+[![Code Climate](https://codeclimate.com/github/IcaliaLabs/sepomex/badges/gpa.svg)](https://codeclimate.com/github/IcaliaLabs/sepomex)
+[![Test Coverage](https://codeclimate.com/github/IcaliaLabs/sepomex/badges/coverage.svg)](https://codeclimate.com/github/IcaliaLabs/sepomex/coverage)
+[![Issue Count](https://codeclimate.com/github/IcaliaLabs/sepomex/badges/issue_count.svg)](https://codeclimate.com/github/IcaliaLabs/sepomex)
+
 # [Sepomex](https://github.com/IcaliaLabs/sepomex)
 
 Sepomex is a REST API that maps all the data from the current zip codes in Mexico. You can get the CSV or Excel files from the [official site](http://www.sepomex.gob.mx/lservicios/servicios/CodigoPostal_Exportar.aspx)

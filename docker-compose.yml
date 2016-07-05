@@ -14,7 +14,6 @@ services:
       - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: s3p0m3x!
-    restart: always
     #entrypoint: /docker-entrypoint-initdb.d/init_db.sh
   web:
     image: ruby:2.2.3
@@ -28,12 +27,11 @@ services:
     stdin_open: true
     # Enable sending signals (CTRL+C, CTRL+P + CTRL+Q) into the container:
     tty: true
-    links:
+    depends_on:
       - db
     command: rackup -p 3000 --host 0.0.0.0
     ports:
       - 3000:3000
-    restart: always
     entrypoint: /usr/src/app/dev-entrypoint.sh
     environment:
       # We'll overwrite the PATH environment variable to include the 'bin/'
