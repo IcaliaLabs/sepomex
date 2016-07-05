@@ -8,7 +8,7 @@ class Municipality < ActiveRecord::Base
   def self.search(params = {})
     municipalities = all
 
-    municipalities = municipalities.find_by_cp(params[:zip_code]) if params[:zip_code].present?
+    municipalities = municipalities.find_by_zip_code(params[:zip_code]) if params[:zip_code].present?
 
     municipalities
   end
