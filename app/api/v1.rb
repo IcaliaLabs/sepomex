@@ -44,7 +44,7 @@ module API
     namespace :cities do
 
       get "/" do
-        cities = City.page(params[:page]).per(50)
+        City.page(params[:page]).per(50)
       end
 
       get ":id", root: "city" do
