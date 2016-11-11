@@ -2,4 +2,4 @@
 /config/database.yml
 *.keep
 .ruby-version
-*.swp
+deploy/

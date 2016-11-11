@@ -65,6 +65,7 @@ namespace :db do
         municipalities = ZipCode.where(d_estado: state.name)
 
         municipalities.each do |municipality|
+          next if Municipality.find_by_name(municipality.d_mnpio)
           state.municipalities.create(name: municipality.d_mnpio, municipality_key: municipality.c_mnpio, zip_code: municipality.d_cp)
         end
 
