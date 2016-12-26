@@ -21,7 +21,7 @@ We build this API in order to provide a way to developers query the zip codes, s
 The base URI to start consuming the JSON response is under:
 
 ```
-https://sepomex-api.herokuapp.com/api/v1/
+http://sepomex.icalialabs.com/api/v1/zip_codes
 ```
 
 There are currently `145,481` records on the database which were extracted from the [CSV file](https://github.com/IcaliaLabs/sepomex/blob/master/lib/support/sepomex_db.csv) included in the project.
@@ -57,10 +57,10 @@ Or by hand
 
 We currently provide 4 kind of resources: 
 
-* **Zip Codes**: [https://sepomex-api.herokuapp.com/api/v1/zip_codes](https://sepomex-api.herokuapp.com/api/v1/zip_codes)
-* **States**: [https://sepomex-api.herokuapp.com/api/v1/states](https://sepomex-api.herokuapp.com/api/v1/states)
-* **Municipalities**: [https://sepomex-api.herokuapp.com/api/v1/municipalities](https://sepomex-api.herokuapp.com/api/v1/municipalities)
-* **Cities**: [https://sepomex-api.herokuapp.com/api/v1/cities](https://sepomex-api.herokuapp.com/api/v1/cities)
+* **Zip Codes**: [http://sepomex.icalialabs.com/api/v1/zip_codes](https://sepomex.icalialabs.com/api/v1/zip_codes)
+* **States**: [http://sepomex.icalialabs.com/api/v1/states](https://sepomex.icalialabs.com/api/v1/states)
+* **Municipalities**: [http://sepomex.icalialabs.com/api/v1/municipalities](https://sepomex.icalialabs.com/api/v1/municipalities)
+* **Cities**: [http://sepomex.icalialabs.com/api/v1/cities](https://sepomex.icalialabs.com/api/v1/cities)
 
 
 ### ZipCodes
@@ -70,31 +70,31 @@ In order to provide more flexibility to search a zip code, whether is by city, c
 #### by city
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d city=monterrey
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes -d city=monterrey
 ```
 
 #### by state
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d state=nuevo%20leon
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes -d state=nuevo%20leon
 ```
 
 #### by colony
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d colony=punta%20contry
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes -d colony=punta%20contry
 ```
 
 #### by cp
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes -d zip_code=67173
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes -d zip_code=67173
 ```
 
 #### all together
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/zip_codes \
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes \
 -d colony=punta%20contry \
 -d state=nuevo%20leon \
 -d city=guadalupe
@@ -109,19 +109,19 @@ The `states` resources can be fetch through several means:
 #### all
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/states
+curl -X GET https://sepomex.icalialabs.com/api/v1/states
 ```
 
 #### by id
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1
+curl -X GET https://sepomex.icalialabs.com/api/v1/states/1
 ```
 
 #### states municipalities
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1/municipalities
+curl -X GET https://sepomex.icalialabs.com/api/v1/states/1/municipalities
 ```
 
 ### Municipalities
@@ -129,19 +129,19 @@ curl -X GET https://sepomex-api.herokuapp.com/api/v1/states/1/municipalities
 #### all
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities
+curl -X GET https://sepomex.icalialabs.com/api/v1/municipalities
 ```
 
 #### by id
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities/1
+curl -X GET https://sepomex.icalialabs.com/api/v1/municipalities/1
 ```
 
 #### by zip_code
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities -d zip_code=67173
+curl -X GET https://sepomex.icalialabs.com/api/v1/municipalities -d zip_code=67173
 ```
 
 ### Cities
@@ -150,14 +150,14 @@ curl -X GET https://sepomex-api.herokuapp.com/api/v1/municipalities -d zip_code=
 
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/cities
+curl -X GET https://sepomex.icalialabs.com/api/v1/cities
 ```
 
 #### by id
 
 
 ```bash
-curl -X GET https://sepomex-api.herokuapp.com/api/v1/cities/1
+curl -X GET https://sepomex.icalialabs.com/api/v1/cities/1
 ```
 
 
