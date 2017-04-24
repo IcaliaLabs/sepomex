@@ -144,7 +144,7 @@ curl -X GET https://sepomex.icalialabs.com/api/v1/municipalities/1
 curl -X GET https://sepomex.icalialabs.com/api/v1/municipalities -d zip_code=67173
 ```
 
-### Cities
+### Cities
 
 #### all
 
