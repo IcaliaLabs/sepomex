@@ -1,18 +1,5 @@
-require './config/env'
-require './sepomex'
-require 'grape-active_model_serializers'
+# This file is used by Rack-based servers to start the application.
 
-map '/api' do
-  use Rack::Cors do
-    allow do
-      origins '*'
-      resource '*',
-        :headers => :any,
-        :methods => :get
-    end
-  end
+require_relative 'config/environment'
 
-  use ActiveRecord::ConnectionAdapters::ConnectionManagement
-
-  run Sepomex
-end
+run Rails.application
