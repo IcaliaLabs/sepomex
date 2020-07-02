@@ -1,0 +1,35 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  d_codigo: MyString
+  d_asenta: MyString
+  d_tipo_asenta: MyString
+  d_mnpio: MyString
+  d_estado: MyString
+  d_ciudad: MyString
+  d_cp: MyString
+  c_estado: MyString
+  c_oficina: MyString
+  c_cp: MyString
+  c_tipo_asenta: MyString
+  c_mnpio: MyString
+  id_asenta_cpcons: MyString
+  d_zona: MyString
+  c_cve_ciudad: MyString
+
+two:
+  d_codigo: MyString
+  d_asenta: MyString
+  d_tipo_asenta: MyString
+  d_mnpio: MyString
+  d_estado: MyString
+  d_ciudad: MyString
+  d_cp: MyString
+  c_estado: MyString
+  c_oficina: MyString
+  c_cp: MyString
+  c_tipo_asenta: MyString
+  c_mnpio: MyString
+  id_asenta_cpcons: MyString
+  d_zona: MyString
+  c_cve_ciudad: MyString
