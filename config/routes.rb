@@ -1,3 +1,11 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  # States routes
+  get '/states', to: 'state#index'
+  get '/state/:id', to: 'state#find_by_id'
+
+  # Municipalities routes
+  get '/municipalities', to: 'municipality#index'
+  get '/municipality/:id', to: 'municipality#find_by_id'
 end
