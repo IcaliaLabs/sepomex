@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # Zipcondes routes
+  # Zipcodes routes
   get '/zipcodes', to: 'zip_code#index'
 
   # States routes
