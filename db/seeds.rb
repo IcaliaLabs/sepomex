@@ -28,10 +28,11 @@ def create_zipcode(row)
                  c_cve_ciudad: row[14])
 end
 
-def seed_table
+def seed_table_zip_code
   puts 'Clearing table zipcodes.'
   ZipCode.delete_all
 
+  puts 'Filling the table zip_codes'
   CSV.foreach(FILE_PATH, col_sep: '|', encoding: 'UTF-8') do |row|
     create_zipcode(row)
   end
@@ -39,4 +40,63 @@ def seed_table
   puts 'Zipcode filling finished'
 end
 
-seed_table
+# seed_table_zip_code
+
+def seed_table_states
+  puts 'Creating states...'
+
+  state_names = ZipCode.pluck(:d_estado).uniq
+  state_names.each do |state_name|
+    cities_count = ZipCode.where(d_estado: state_name).pluck(:d_mnpio).uniq.count
+
+    State.create(name: state_name, cities_count: cities_count)
+  end
+  puts 'Done!'
+end
+
+# seed_table_states
+
+def seed_table_municipalities
+  puts 'Creating municipalities...'
+
+  states = State.all
+  states.each do |state|
+    municipalities = ZipCode.where(d_estado: state.name)
+
+    municipalities.each do |municipality|
+      next if Municipality.find_by_name(municipality.d_mnpio)
+
+      state.municipalities.create(name: municipality.d_mnpio,
+                                  municipality_key: municipality.c_mnpio,
+                                  zip_code: municipality.d_cp)
+    end
+  end
+  puts 'Done!'
+end
+
+# seed_table_municipalities
+
+def seed_table_cities
+  puts 'Clearing table cities.'
+  City.delete_all
+
+  puts 'Creating cities...'
+
+  states = State.all
+  states.each do |state|
+    zip_codes_by_state = ZipCode.where(d_estado: state.name)
+
+    zip_codes_by_state.each do |zip_code|
+      next if City.find_by_name(zip_code.d_ciudad)
+
+      city_name = 'sin nombre'
+
+      city_name = zip_code.d_ciudad if zip_code.d_ciudad.present?
+
+      state.cities.create(name: city_name)
+    end
+  end
+  puts 'Done!'
+end
+
+seed_table_cities
