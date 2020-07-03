@@ -9,7 +9,7 @@ require 'csv'
 FILE_PATH = 'lib/sepomex_db.csv'
 
 def create_zipcode(row)
-  puts "Creating #{row[0]}. #{row[3]}, #{row[4]}"
+  puts "Creating #{row[0]}. #{row[3]}, #{row[4]}."
 
   ZipCode.create(d_codigo: row[0],
                  d_asenta: row[1],
@@ -40,23 +40,24 @@ def seed_table_zip_code
   puts 'Zipcode filling finished'
 end
 
-# seed_table_zip_code
-
 def seed_table_states
+  puts 'Clearing table states.'
+  State.delete_all
+
   puts 'Creating states...'
 
   state_names = ZipCode.pluck(:d_estado).uniq
   state_names.each do |state_name|
     cities_count = ZipCode.where(d_estado: state_name).pluck(:d_mnpio).uniq.count
 
+    puts "Creating #{state_name}."
     State.create(name: state_name, cities_count: cities_count)
   end
   puts 'Done!'
 end
 
-# seed_table_states
-
 def seed_table_municipalities
+  Municipality.delete_all
   puts 'Creating municipalities...'
 
   states = State.all
@@ -66,6 +67,7 @@ def seed_table_municipalities
     municipalities.each do |municipality|
       next if Municipality.find_by_name(municipality.d_mnpio)
 
+      puts "Creating #{municipality.d_mnpio}."
       state.municipalities.create(name: municipality.d_mnpio,
                                   municipality_key: municipality.c_mnpio,
                                   zip_code: municipality.d_cp)
@@ -73,8 +75,6 @@ def seed_table_municipalities
   end
   puts 'Done!'
 end
-
-# seed_table_municipalities
 
 def seed_table_cities
   puts 'Clearing table cities.'
@@ -89,14 +89,18 @@ def seed_table_cities
     zip_codes_by_state.each do |zip_code|
       next if City.find_by_name(zip_code.d_ciudad)
 
-      city_name = 'sin nombre'
+      city_name = 'N/A'
 
       city_name = zip_code.d_ciudad if zip_code.d_ciudad.present?
 
+      puts "Creating #{city_name}."
       state.cities.create(name: city_name)
     end
   end
   puts 'Done!'
 end
 
+seed_table_zip_code
+seed_table_states
+seed_table_municipalities
 seed_table_cities
