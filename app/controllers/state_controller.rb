@@ -10,4 +10,10 @@ class StateController < ApplicationController
   def find_by_id
     render json: State.find(params[:id])
   end
+
+  # GET '/state/:id/municipalities'
+  def municipalities
+    state = State.find(params[:id])
+    render json: state.municipalities.order(:id)
+  end
 end
