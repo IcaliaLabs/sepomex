@@ -4,3 +4,4 @@
 .ruby-version
 deploy/
 /db/development.sqlite3
+/log/development.log
