@@ -7,7 +7,7 @@ class StateController < ApplicationController
   end
 
   # GET '/state/:id'
-  def find_by_id
+  def show
     render json: State.find(params[:id])
   end
 

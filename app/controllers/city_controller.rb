@@ -7,7 +7,7 @@ class CityController < ApplicationController
   end
 
   # GET '/city/:id'
-  def find_by_id
+  def show
     render json: City.find(params[:id])
   end
 end

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class MunicipalityController < ApplicationController
-  # GET '/municipalities'
+  # GET '/municipality'
   def index
     render json: Municipality.all
   end
 
   # GET '/municipality/:id'
-  def find_by_id
+  def show
     render json: Municipality.find(params[:id])
   end
 end
