@@ -3,7 +3,7 @@
 class MunicipalityController < ApplicationController
   # GET '/municipality'
   def index
-    render json: Municipality.all
+    paginate Municipality.unscoped, per_page: 15
   end
 
   # GET '/municipality/:id'
