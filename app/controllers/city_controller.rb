@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class CityController < ApplicationController
-  # GET '/cities'
+  # GET '/city'
   def index
-    render json: City.all
+    paginate City.unscoped, per_page: 15
   end
 
   # GET '/city/:id'

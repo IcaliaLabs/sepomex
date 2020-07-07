@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ZipCodeController < ApplicationController
-  # GET '/zipcodes'
+  # GET '/zip_code'
   def index
-    render json: ZipCode.all.limit(50)
+    paginate ZipCode.unscoped, per_page: 15
   end
 end
