@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ZipCode < ApplicationRecord
+  validates_presence_of :d_codigo
+
   default_scope { order(:id) }
 
   scope :find_by_zip_code, lambda { |cp|
