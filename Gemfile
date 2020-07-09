@@ -36,6 +36,7 @@ gem 'pagy', '~> 3.8', '>= 3.8.2'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 # Testing
+gem 'factory_bot', '~> 6.0', '>= 6.0.2'
 gem 'rspec-rails', '~> 4.0', '>= 4.0.1'
 
 group :development, :test do
@@ -52,3 +53,7 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+
+group :test do
+  gem 'shoulda-matchers', '~> 4.3'
+end
