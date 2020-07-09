@@ -1,4 +1,6 @@
 class Municipality < ApplicationRecord
+  validates_presence_of :name
+  validates_presence_of :zip_code
   belongs_to :state
 
   scope :find_by_zip_code, lambda { |cp|
