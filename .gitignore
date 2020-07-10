@@ -7,4 +7,4 @@ deploy/
 /log/development.log
 /tmp
 tmp/cache/bootsnap-load-path-cache
-bootsnap-load-path-cache
+log/test.log

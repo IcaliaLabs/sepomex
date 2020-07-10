@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class StateController < ApplicationController
-  # GET '/states'
+  # GET '/state'
   def index
-    render json: State.all
+    paginate State.unscoped, per_page: 15
   end
 
   # GET '/state/:id'
