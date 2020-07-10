@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ZipCode < ApplicationRecord
-  validates_presence_of :d_codigo
+  validates :d_codigo, presence: true
 
   default_scope { order(:id) }
 
