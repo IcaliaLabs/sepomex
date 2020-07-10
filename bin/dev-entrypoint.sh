@@ -10,13 +10,6 @@ set -e
 : ${APP_SETUP_LOCK:="$APP_TEMP_PATH/setup.lock"}
 : ${APP_SETUP_WAIT:="5"}
 
-# Ensure the node_modules folder belongs to the developer user:
-APP_NODE_MODULES="${APP_PATH}/node_modules"
-NODE_MODULES_OWNER_ID=$(stat -c "%u" "${APP_NODE_MODULES}")
-if [ "${NODE_MODULES_OWNER_ID}" -ne "${DEVELOPER_UID}" ]; then
-  sudo chown -R ${DEVELOPER_UID}:${DEVELOPER_GID} "${APP_NODE_MODULES}"
-fi
-
 # 1: Define the functions lock and unlock our app containers setup processes:
 lock_setup() { mkdir -p $APP_TEMP_PATH && touch $APP_SETUP_LOCK; }
 unlock_setup() { rm -rf $APP_SETUP_LOCK; }
