@@ -3,10 +3,11 @@
 Rails.application.routes.draw do
   resources :zip_codes, only: %i[index]
 
-  resources :state, only: %i[index show]
+  resources :states, only: %i[index show]
+
   get '/state/:id/municipalities', to: 'state#municipalities'
 
-  resources :municipality, only: %i[index show]
+  resources :municipalities, only: %i[index show]
 
-  resources :city, only: %i[index show]
+  resources :cities, only: %i[index show]
 end
