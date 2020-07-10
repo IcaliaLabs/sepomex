@@ -1,0 +1,31 @@
+version: "3.7"
+
+volumes:
+  postgres_data:
+
+networks:
+  backend:
+
+services:
+  postgres:
+    image: postgres:10.6-alpine
+    volumes:
+      # We'll store the postgres data in the 'postgres_data' volume we defined:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    environment:
+      POSTGRES_PASSWORD: 3x4mpl3P455w0rd
+
+  # Where are the rest of the app services? (i.e. test, worker, web, etc)
+  #
+  # We've separated the app services from the rest of the services to streamline
+  # the CI/CD pipeline execution. You'll find the app service definitions on the
+  # `docker-compose.override.yml` file.
+  #
+  # You don't have to do anything special to docker-compose or plis to make the
+  # project work as usual. By default, `docker-compose` will read
+  # `docker-compose.yml` and `docker-compose.override.yml` files, merging their
+  # contents before doing any actual work.
+  #
+  # See https://docs.docker.com/compose/extends/#understanding-multiple-compose-files
