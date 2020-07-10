@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :zip_code, only: %i[index]
+  resources :zip_codes, only: %i[index]
 
   resources :state, only: %i[index show]
   get '/state/:id/municipalities', to: 'state#municipalities'
