@@ -18,7 +18,7 @@ We build this API in order to provide a way to developers query the zip codes, s
 The base URI to start consuming the JSON response is under:
 
 ```bash
-http://sepomex.icalialabs.com/zip_code
+http://sepomex.icalialabs.com/zip_codes
 ```
 
 There are currently `145,481` records on the database which were extracted from the [CSV file](https://github.com/IcaliaLabs/sepomex/blob/master/lib/support/sepomex_db.csv) included in the project.
@@ -33,10 +33,10 @@ Pending. Here will be the instructions to run the project with Docker. TBD
 
 We currently provide 4 kind of resources:
 
-- **Zip Codes**: [http://sepomex.icalialabs.com/zip_code](https://sepomex.icalialabs.com/zip_code)
-- **States**: [http://sepomex.icalialabs.com/state](https://sepomex.icalialabs.com/state)
-- **Municipalities**: [http://sepomex.icalialabs.com/municipality](https://sepomex.icalialabs.com/municipality)
-- **Cities**: [http://sepomex.icalialabs.com/city](https://sepomex.icalialabs.com/city)
+- **Zip Codes**: [http://sepomex.icalialabs.com/zip_codes](https://sepomex.icalialabs.com/zip_codes)
+- **States**: [http://sepomex.icalialabs.com/states](https://sepomex.icalialabs.com/states)
+- **Municipalities**: [http://sepomex.icalialabs.com/municipalities](https://sepomex.icalialabs.com/municipalities)
+- **Cities**: [http://sepomex.icalialabs.com/cities](https://sepomex.icalialabs.com/cities)
 
 ### ZipCodes
 
@@ -45,7 +45,7 @@ In order to provide more flexibility to search a zip code, whether is by city, c
 #### all
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/zip_code 
+curl -X GET https://sepomex.icalialabs.com/zip_codes 
 ```
 
 ##### Response
@@ -95,7 +95,7 @@ The `states` resources can be fetch through several means:
 #### all
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/state
+curl -X GET https://sepomex.icalialabs.com/states
 ```
 
 ##### Response
@@ -129,7 +129,7 @@ curl -X GET https://sepomex.icalialabs.com/state
 #### by id
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/state/1
+curl -X GET https://sepomex.icalialabs.com/states/1
 ```
 
 ##### Response
@@ -179,7 +179,7 @@ curl -X GET https://sepomex.icalialabs.com/state/1/municipalities
 #### all
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/municipality
+curl -X GET https://sepomex.icalialabs.com/municipalities
 ```
 
 ##### Response
@@ -214,7 +214,7 @@ curl -X GET https://sepomex.icalialabs.com/municipality
 #### by id
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/municipality/1
+curl -X GET https://sepomex.icalialabs.com/municipalities/1
 ```
 
 ##### Response
@@ -236,7 +236,7 @@ curl -X GET https://sepomex.icalialabs.com/municipality/1
 #### all
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/city
+curl -X GET https://sepomex.icalialabs.com/cities
 ```
 
 ##### Response
@@ -269,7 +269,7 @@ curl -X GET https://sepomex.icalialabs.com/city
 #### by id
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/city/1
+curl -X GET https://sepomex.icalialabs.com/cities/1
 ```
 
 ##### Response
