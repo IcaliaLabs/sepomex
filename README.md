@@ -88,6 +88,36 @@ curl -X GET https://sepomex.icalialabs.com/zip_codes
 }
 ```
 
+#### by city
+
+```bash
+curl -X GET https://sepomex.icalialabs.com/zip_codes?city=monterrey
+```
+
+#### by state
+
+```bash
+curl -X GET https://sepomex.icalialabs.com/zip_codes?state=nuevo%20leon
+```
+
+#### by colony
+
+```bash
+curl -X GET https://sepomex.icalialabs.com/zip_codes?colony=punta%20contry
+```
+
+#### by cp
+
+```bash
+curl -X GET https://sepomex.icalialabs.com/zip_codes?zip_code=67173
+```
+
+#### all together
+
+```bash
+curl -X GET https://sepomex.icalialabs.com/zip_codes?colony=punta%20contry&state=nuevo%20leon&city=guadalupe
+```
+
 ### States
 
 The `states` resources can be fetch through several means:
