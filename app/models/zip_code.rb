@@ -25,15 +25,18 @@ class ZipCode < ApplicationRecord
   def self.search(params = {})
     zip_codes = all
 
-    if params[:cp].present? || params[:zip_code].present?
-      zip_codes = zip_codes.find_by_zip_code(params[:cp] || params[:zip_code])
+    if params['cp'].present? || params['zip_code'].present?
+      zip_codes = zip_codes.find_by_zip_code(params['cp'] || params['zip_code'])
     end
-    if params[:state].present?
-      zip_codes = zip_codes.find_by_state(params[:state])
+
+    if params['state'].present?
+      zip_codes = zip_codes.find_by_state(params['state'])
     end
-    zip_codes = zip_codes.find_by_city(params[:city]) if params[:city].present?
-    if params[:colony].present?
-      zip_codes = zip_codes.find_by_colony(params[:colony])
+
+    zip_codes = zip_codes.find_by_city(params['city']) if params['city'].present?
+
+    if params['colony'].present?
+      zip_codes = zip_codes.find_by_colony(params['colony'])
     end
 
     zip_codes
