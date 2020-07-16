@@ -8,26 +8,8 @@ RSpec.describe ZipCode, type: :model do
   end
 
   context 'scopes tests' do
-    let(:params) do
-      { d_codigo: '01000',
-        d_asenta: 'San Ángel',
-        d_tipo_asenta: 'Colonia',
-        d_mnpio: 'Álvaro Obregón',
-        d_estado: 'Ciudad de México',
-        d_ciudad: 'Ciudad de México',
-        d_cp: '01001',
-        c_estado: '09',
-        c_oficina: '01001',
-        c_cp: '.',
-        c_tipo_asenta: '09',
-        c_mnpio: '010',
-        id_asenta_cpcons: '0001',
-        d_zona: 'Urbano',
-        c_cve_ciudad: '01' }
-    end
-
     before(:each) do
-      ZipCode.create(params)
+      FactoryBot.create(:zip_code)
     end
 
     it 'should return a zip_code' do
@@ -36,7 +18,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a wrong zip_code gives empty results' do
       cp = '64000'
-      expect(ZipCode.find_by_zip_code(cp)).to eq([])
+      expect(ZipCode.find_by_zip_code(cp)).to be_empty
     end
 
     it 'search for a valid zip_code gives valid results' do
@@ -46,7 +28,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a wrong state gives empty results' do
       state = 'Nuevo Leon'
-      expect(ZipCode.find_by_state(state)).to eq([])
+      expect(ZipCode.find_by_state(state)).to be_empty
     end
 
     it 'search for a valid state gives valid results' do
@@ -56,7 +38,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a wrong city gives empty results' do
       city = 'Nuevo Leon'
-      expect(ZipCode.find_by_city(city)).to eq([])
+      expect(ZipCode.find_by_city(city)).to be_empty
     end
 
     it 'search for a valid city gives valid results' do
@@ -66,7 +48,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a wrong colony gives empty results' do
       colony = 'Lomas de Anahuac'
-      expect(ZipCode.find_by_colony(colony)).to eq([])
+      expect(ZipCode.find_by_colony(colony)).to be_empty
     end
 
     it 'search for a valid colony gives valid results' do
