@@ -7,6 +7,30 @@ RSpec.describe ZipCode, type: :model do
     it { should validate_presence_of(:d_codigo) }
   end
 
+  def create_states(states)
+    states.each do |state|
+      FactoryBot.create(:zip_code, d_estado: state)
+    end
+  end
+
+  def create_cp(cp)
+    cp.each do |c_p|
+      FactoryBot.create(:zip_code, d_cp: c_p)
+    end
+  end
+
+  def create_city(city)
+    city.each do |cities|
+      FactoryBot.create(:zip_code, d_ciudad: cities)
+    end
+  end
+
+  def create_colony(colony)
+    colony.each do |col|
+      FactoryBot.create(:zip_code, d_asenta: col)
+    end
+  end
+
   context 'scopes tests' do
     let!(:zip_code) { FactoryBot.create(:zip_code) }
 
@@ -15,10 +39,7 @@ RSpec.describe ZipCode, type: :model do
     end
 
     it 'search for a wrong zip_code gives empty results' do
-      FactoryBot.create(:zip_code, d_cp: '57300')
-      FactoryBot.create(:zip_code, d_cp: '21360')
-      FactoryBot.create(:zip_code, d_cp: '81920')
-
+      create_cp(%w[57300 21360 81920])
       cp = '64000'
 
       expect(ZipCode.find_by_zip_code(cp)).to be_empty
@@ -31,10 +52,7 @@ RSpec.describe ZipCode, type: :model do
     end
 
     it 'search for a wrong state gives empty results' do
-      FactoryBot.create(:zip_code, d_estado: 'Tamaulipas')
-      FactoryBot.create(:zip_code, d_estado: 'Coahuila')
-      FactoryBot.create(:zip_code, d_estado: 'Sinaloa')
-
+      create_states(%w[Tamaulipas Sinaloa Tijuana])
       state = 'Nuevo Leon'
 
       expect(ZipCode.find_by_state(state)).to be_empty
@@ -47,10 +65,7 @@ RSpec.describe ZipCode, type: :model do
     end
 
     it 'search for a wrong city gives empty results' do
-      FactoryBot.create(:zip_code, d_ciudad: 'Tamaulipas')
-      FactoryBot.create(:zip_code, d_ciudad: 'Coahuila')
-      FactoryBot.create(:zip_code, d_ciudad: 'Sinaloa')
-
+      create_city(%w[Tamaulipas Coahuila Sinaloa])
       city = 'Nuevo Leon'
 
       expect(ZipCode.find_by_city(city)).to be_empty
@@ -63,10 +78,7 @@ RSpec.describe ZipCode, type: :model do
     end
 
     it 'search for a wrong colony gives empty results' do
-      FactoryBot.create(:zip_code, d_asenta: 'Juárez')
-      FactoryBot.create(:zip_code, d_asenta: 'Polanco')
-      FactoryBot.create(:zip_code, d_asenta: 'Centro')
-
+      create_colony(%w[Juárez Polanco Centro])
       colony = 'Lomas de Anahuac'
 
       expect(ZipCode.find_by_colony(colony)).to be_empty
