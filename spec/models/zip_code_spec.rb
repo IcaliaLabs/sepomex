@@ -1,34 +1,13 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require './spec/support/test_helper'
 
 RSpec.describe ZipCode, type: :model do
+  include Helper
+
   context 'validations tests' do
     it { should validate_presence_of(:d_codigo) }
-  end
-
-  def create_states(states)
-    states.each do |state|
-      FactoryBot.create(:zip_code, d_estado: state)
-    end
-  end
-
-  def create_cp(cp)
-    cp.each do |c_p|
-      FactoryBot.create(:zip_code, d_cp: c_p)
-    end
-  end
-
-  def create_city(city)
-    city.each do |cities|
-      FactoryBot.create(:zip_code, d_ciudad: cities)
-    end
-  end
-
-  def create_colony(colony)
-    colony.each do |col|
-      FactoryBot.create(:zip_code, d_asenta: col)
-    end
   end
 
   context 'scopes tests' do
