@@ -7,8 +7,8 @@ module Helper
     end
   end
 
-  def create_cp(cp)
-    cp.each do |c_p|
+  def create_cp(postcode)
+    postcode.each do |c_p|
       FactoryBot.create(:zip_code, d_cp: c_p)
     end
   end

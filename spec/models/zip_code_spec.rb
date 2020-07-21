@@ -19,15 +19,15 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a wrong zip_code gives empty results' do
       create_cp(%w[57300 21360 81920])
-      cp = '64000'
+      postcode = '64000'
 
-      expect(ZipCode.find_by_zip_code(cp)).to be_empty
+      expect(ZipCode.find_by_zip_code(postcode)).to be_empty
     end
 
     it 'search for a valid zip_code gives valid results' do
-      cp = '01000'
+      postcode = '01000'
 
-      expect(ZipCode.find_by_zip_code(cp)).to eq([ZipCode.last])
+      expect(ZipCode.find_by_zip_code(postcode)).to eq([zip_code])
     end
 
     it 'search for a wrong state gives empty results' do
@@ -40,7 +40,7 @@ RSpec.describe ZipCode, type: :model do
     it 'search for a valid state gives valid results' do
       state = 'Ciudad de México'
 
-      expect(ZipCode.find_by_state(state)).to eq([ZipCode.last])
+      expect(ZipCode.find_by_state(state)).to eq([zip_code])
     end
 
     it 'search for a wrong city gives empty results' do
@@ -53,7 +53,7 @@ RSpec.describe ZipCode, type: :model do
     it 'search for a valid city gives valid results' do
       city = 'Ciudad de México'
 
-      expect(ZipCode.find_by_city(city)).to eq([ZipCode.last])
+      expect(ZipCode.find_by_city(city)).to eq([zip_code])
     end
 
     it 'search for a wrong colony gives empty results' do
@@ -66,7 +66,7 @@ RSpec.describe ZipCode, type: :model do
     it 'search for a valid colony gives valid results' do
       colony = 'San Ángel'
 
-      expect(ZipCode.find_by_colony(colony)).to eq([ZipCode.last])
+      expect(ZipCode.find_by_colony(colony)).to eq([zip_code])
     end
   end
 end
