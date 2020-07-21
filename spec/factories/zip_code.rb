@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :zip_code do
+  factory :zip_code, class: 'ZipCode' do
     d_codigo { '01000' }
     d_asenta { 'San Ángel' }
     d_tipo_asenta { 'Colonia' }

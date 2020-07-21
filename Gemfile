@@ -27,8 +27,6 @@ gem 'pagy', '~> 3.8', '>= 3.8.2'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 # Testing
-gem 'factory_bot', '~> 6.0', '>= 6.0.2'
-gem 'rspec-rails', '~> 4.0', '>= 4.0.1'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -46,5 +44,7 @@ end
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 group :test do
+  gem 'factory_bot_rails', '~> 6.1'
+  gem 'rspec-rails', '~> 4.0', '>= 4.0.1'
   gem 'shoulda-matchers', '~> 4.3'
 end
