@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class CitiesController < ApplicationController
-  
+class Api::V1::CitiesController < ApplicationController
   # GET '/cities'
   def index
     paginate City.unscoped, per_page: 15

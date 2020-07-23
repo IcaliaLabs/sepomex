@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'ZipCode requests' do
   describe 'GET/zip_code' do
     before do
-      get('/zip_codes')
+      get('/api/v1/zip_codes')
     end
 
     it 'is a valid route' do
