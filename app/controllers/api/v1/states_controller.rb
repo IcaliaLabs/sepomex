@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class StatesController < ApplicationController
-
+class Api::V1::StatesController < ApplicationController
   # GET '/states'
   def index
     paginate State.unscoped, per_page: 15
