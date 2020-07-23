@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Municipality requests' do
   describe 'GET/municipality' do
     before do
-      get('/municipalities')
+      get('/api/v1/municipalities')
     end
 
     it 'is a valid route' do

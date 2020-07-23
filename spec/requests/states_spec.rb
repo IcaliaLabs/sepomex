@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'State requests' do
   describe 'GET/state' do
     before do
-      get('/states')
+      get('/api/v1/states')
     end
 
     it 'is a valid route' do
