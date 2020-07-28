@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ZipCodeSerializer < ActiveModel::Serializer
   attributes :id, :d_codigo, :d_asenta, :d_tipo_asenta,
              :d_mnpio, :d_estado, :d_ciudad, :d_cp, :c_estado,

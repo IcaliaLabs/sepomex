@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This script is used by this project's Docker development entrypoint script
+# to check if the app database (and any of the configured database schemas)
+# exists, tripping out if they are missing.
+#
+# If this script trips out, the entrypoint script will then try to run the
+# database setup. This is part of the magic that allows us the "clone & run"
+# configuration.
+require 'rubygems'
+require 'rake'
+require 'bundler'
+
+Bundler.setup(:default)
+
+require 'active_record'
+require 'yaml'
+require 'erb'
+
+def parse_config_file
+  database_yaml = Pathname.new File.expand_path('config/database.yml')
+  loaded_yaml = YAML.load(ERB.new(database_yaml.read).result) || {}
+  shared = loaded_yaml.delete('shared')
+
+  loaded_yaml.each { |_k, values| values.reverse_merge!(shared) } if shared
+  Hash.new(shared).merge(loaded_yaml)
+end
+
+def config
+  @config ||= parse_config_file.fetch ENV.fetch('RAILS_ENV', 'development')
+end
+
+def establish_connection
+  ActiveRecord::Base.establish_connection config
+  ActiveRecord::Base.connection_pool.with_connection { |connection| }
+end
+
+def database_initialized?
+  ActiveRecord::Base.connection_pool.with_connection do |connection|
+    connection.data_source_exists? :schema_migrations
+  end
+end
+
+begin
+  connection_tries ||= 3
+
+  establish_connection
+  
+  exit 1 unless database_initialized?
+  exit 0
+rescue PG::ConnectionBad
+  unless (connection_tries -= 1).zero?
+    puts "Retrying DB connection #{connection_tries} more times..."
+    sleep ENV.fetch('APP_SETUP_WAIT', '5').to_i
+    retry
+  end
+  exit 2
+rescue ActiveRecord::NoDatabaseError
+  exit 3
+end
