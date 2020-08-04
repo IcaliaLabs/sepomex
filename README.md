@@ -10,6 +10,11 @@ We build this API in order to provide a way to developers query the zip codes, s
 - [Quick start](#quick-start)
 - [Querying the API](#querying-the-api)
 - [About pagination](#about-pagination)
+- [Development](#development)
+  - [Setup the project](#setup-the-project)
+  - [Running the project](#running-the-project)
+  - [Stop the project](#stop-the-project)
+  - [Running specs](#running-specs)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -344,7 +349,95 @@ The structure of a paged response is:
   - ``last`` is the url for the last page.
   - ``prev`` is the url for the previous page.
   - ``next`` is the url for the next page.
-  
+
+## Development
+
+**Setup the project**
+
+To setup the project please follow this simple steps:
+
+1. Clone this repository into your local machine:
+
+```bash
+$ git clone git@github.com:IcaliaLabs/sepomex.git
+```
+
+2. Change directory into the project folder:
+
+```bash
+$ cd sepomex
+```
+
+3. Run the web service in bash mode to get inside the container by using the following command:
+
+```bash
+$ docker-compose run web bash
+```
+
+4. Inside the container you need to migrate the database:
+
+```bash
+$ rails db:migrate
+```
+
+5. Next you should populate the database:
+
+```bash
+$ rails db:seed
+```
+This operation will take some time, due to the number of records.
+
+6. Close the container
+
+```bash
+$ exit
+```
+
+**Running the project**
+
+1. Fire up a terminal and run:
+
+```bash
+$ docker-compose up
+```
+
+Once you see an output like this:
+
+```bash
+web_1        | The Gemfile's dependencies are satisfied
+web_1        | 2020/08/04 17:40:21 Waiting for: tcp://postgres:5432
+web_1        | 2020/08/04 17:40:21 Connected to tcp://postgres:5432
+web_1        | => Booting Puma
+web_1        | => Rails 6.0.3.2 application starting in development 
+web_1        | => Run `rails server --help` for more startup options
+web_1        | Puma starting in single mode...
+web_1        | * Version 3.12.6 (ruby 2.7.1-p83), codename: Llamas in Pajamas
+web_1        | * Min threads: 5, max threads: 5
+web_1        | * Environment: development
+web_1        | * Listening on tcp://0.0.0.0:3000
+web_1        | Use Ctrl-C to stop
+```
+
+This means the project is up and running.
+
+**Stop the project**
+
+1. Use `Ctrl-C` to stop.
+
+2. If you want to remove the containers use:
+
+```bash
+$ docker-compose down
+```
+
+**Running specs**
+
+To run specs, you can do:
+
+```bash
+$ docker-compose run test rspec
+```
+
 ## Contributing
 
 Please submit all pull requests against a separate branch.
