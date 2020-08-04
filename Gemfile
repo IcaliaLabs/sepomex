@@ -25,7 +25,7 @@ gem 'active_model_serializers', '~> 0.10.10'
 gem 'pager_api', '~> 0.3.2'
 gem 'pagy', '~> 3.8', '>= 3.8.2'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
-# gem 'rack-cors'
+gem 'rack-cors', '~> 1.1', '>= 1.1.1'
 # Testing
 
 group :development, :test do
