@@ -18,4 +18,3 @@ before_install:
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-  - cp config/database.yml.travis config/database.yml
