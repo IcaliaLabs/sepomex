@@ -1,4 +1,4 @@
-language: ruby
+language: ruby-2.7.1
 
 services:
   - docker
