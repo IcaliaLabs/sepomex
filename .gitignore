@@ -8,3 +8,5 @@ deploy/
 /tmp
 tmp/cache/bootsnap-load-path-cache
 log/test.log
+
+docker-compose.override.yml
