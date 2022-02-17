@@ -45,6 +45,17 @@ group :development do
   # Support for Ruby IDE tools - including "Ruby for Visual Studio Code"
   gem 'debase', '~> 0.2.4.1', require: false
   gem 'ruby-debug-ide', '~> 0.7.3', require: false
+
+  # Ruby code linters:
+  gem 'reek', '~> 6.1', require: false
+
+  gem 'rubocop',             '~> 1.25', '>= 1.25.1', require: false
+  gem 'rubocop-performance', '~> 1.13', '>= 1.13.2', require: false
+  gem 'rubocop-rails',       '~> 2.13', '>= 2.13.2', require: false
+  gem 'rubocop-rspec',       '~> 2.8',               require: false
+
+  # IDE tools for code completion, inline documentation, and static analysis
+  gem 'solargraph', '~> 0.44.3', require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

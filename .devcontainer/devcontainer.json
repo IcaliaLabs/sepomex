@@ -53,6 +53,13 @@
     // Code:
     "rebornix.ruby",
 
+    // execute rubocop for current Ruby code.
+    "misogi.ruby-rubocop",
+
+    // A language server that provides intellisense, code completion, and inline
+    // documentation for Ruby:
+    "castwide.solargraph",
+
     // Search modules, class and methods in ruby files using vscode go to symbol:
     "miguel-savignano.ruby-symbols",
 
