@@ -3,38 +3,18 @@ volumes:
 
 services:
   postgres:
-    image: postgres:10.6-alpine
+    image: postgres:12.9-alpine
     volumes:
       # We'll store the postgres data in the 'postgres_data' volume we defined:
       - type: volume
         source: postgres_data
         target: /var/lib/postgresql/data
-      # - type: bind
-      #   source: ./db/dumps
-      #   target: /db/dumps
-      # - ./bin/dumpdb:/usr/local/sbin/dumpdb:ro
-      # - ./bin/restoredb:/usr/local/sbin/restoredb:ro
-    ports:
+    ports:  
       - published: ${SEPOMEX_PG_PORT:-5432}
         target: 5432
     environment:
+      POSTGRES_USER: ${USER:-you}
       POSTGRES_HOST_AUTH_METHOD: trust
-
-  # Used to connect to the Cloud SQL Instances during the continuous deployment
-  # - See https://cloud.google.com/sql/docs/postgres/connect-admin-proxy#connect-to-proxy
-  cloudsql:
-    image: gcr.io/cloudsql-docker/gce-proxy:1.23.0-alpine
-    command: /cloud_sql_proxy -instances=icalia-devops:us-central1:pg-thirteen-b=tcp:0.0.0.0:5432
-    ports:
-      # We'll bind the host port to localhost (127.0.0.1):
-      - 127.0.0.1:${SEPOMEX_CLOUDSQL_PG_PORT:-5433}:5432
-    volumes:
-      - type: bind
-        source: ./google-cloud-credentials.json
-        target: /config/google-cloud-credentials.json
-        read_only: true
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /config/google-cloud-credentials.json
 
   # The tests container:
   tests: &app
