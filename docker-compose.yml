@@ -63,7 +63,7 @@ services:
 
       DEBIAN_FRONTEND: dialog
 
-      DATABASE_URL: postgres://postgres@postgres:5432/?encoding=unicode
+      DATABASE_URL: postgres://postgres:5432/?encoding=unicode
       
   # The development container:
   development:
