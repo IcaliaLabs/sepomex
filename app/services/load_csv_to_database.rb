@@ -65,8 +65,8 @@ class LoadCsvToDatabase
     SQL
   end
 
-  def insert_sql
-    <<~SQL.squish
+  def insert_zip_codes
+    database_execute <<~SQL.squish
       #{import_cte}
       INSERT INTO "zip_codes" (
         "d_codigo", "d_asenta", "d_tipo_asenta", "d_mnpio", "d_estado", "d_ciudad",
@@ -80,8 +80,8 @@ class LoadCsvToDatabase
     SQL
   end
 
-  def update_sql
-    <<~SQL.squish
+  def update_zip_codes
+    database_execute <<~SQL.squish
       #{import_cte}
       UPDATE "zip_codes" SET
         "d_codigo"         = "updates"."d_codigo",
@@ -109,21 +109,51 @@ class LoadCsvToDatabase
 
   def update_zip_code_table
     notify_load_progress 'Updating the "zip_codes" table...'
-    database_execute insert_sql
-    database_execute update_sql
+    insert_zip_codes
+    update_zip_codes
     notify_load_progress '..."zip_codes" updating finished'
+  end
+
+  def state_import_cte
+    <<~SQL.squish
+      WITH "input_data" AS (
+        SELECT "c_estado"::integer AS "id", "d_estado" AS "name"
+        FROM "zip_codes"
+        GROUP BY "d_estado", "c_estado"
+        ORDER BY "c_estado"::integer
+      ), "updates" AS (
+        SELECT
+          "states"."id",
+          "input_data"."name",
+          "input_data"."id" as "id_on_import_data"
+        FROM
+          "input_data"
+          LEFT JOIN "states" ON "input_data"."id" = "states"."id"
+      )
+    SQL
+  end
+
+  def insert_states
+    database_execute <<~SQL.squish
+      #{state_import_cte}
+      INSERT INTO "states" ("id", "name", "cities_count")
+      SELECT "id_on_import_data", "name", 0
+      FROM "updates" WHERE "id" IS NULL
+    SQL
+  end
+
+  def update_states
+    database_execute <<~SQL.squish
+      #{state_import_cte}
+      UPDATE "states" SET "name" = "updates"."name"
+      FROM "updates" WHERE "states"."id" = "updates"."id"
+    SQL
   end
 
   def update_states_table
     notify_load_progress 'Creating states...'
-
-    state_names = ZipCode.pluck(:d_estado).uniq
-    state_names.each do |state_name|
-      cities_count = ZipCode.where(d_estado: state_name).pluck(:d_mnpio).uniq.count
-
-      notify_load_progress "Creating #{state_name}."
-      State.find_or_create_by(name: state_name, cities_count: cities_count)
-    end
+    insert_states
+    update_states
     notify_load_progress 'Done!'
   end
 
