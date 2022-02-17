@@ -20,6 +20,9 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # The CSV library provides a complete interface to CSV files and data.
 gem 'csv', '~> 3.1', '>= 3.1.5'
 
+# Routines specially designed to run the app on development & live containers:
+gem 'on_container', '~> 0.0.16'
+
 # Pagination
 gem 'active_model_serializers', '~> 0.10.10'
 gem 'pager_api', '~> 0.3.2'

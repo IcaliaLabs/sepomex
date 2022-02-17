@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+require 'on_container/dev/rails'
+
+set_given_or_default_command
+
+if command_requires_setup?
+  on_setup_lock_acquired do
+    ensure_project_gems_are_installed
+
+    if command_might_require_database?
+      wait_for_service_to_accept_connections 'tcp://postgres:5432'
+      setup_activerecord_database unless activerecord_database_ready?
+    end
+
+    remove_rails_pidfile if rails_server?
+  end
+end
+
+execute_given_or_default_command
