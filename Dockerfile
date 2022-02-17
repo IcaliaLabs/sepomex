@@ -218,7 +218,6 @@ RUN rm -rf \
     .vscode \
     Guardfile \
     bin/rspec \
-    bin/checkdb \
     bin/dumpdb \
     bin/restoredb \
     bin/setup \
