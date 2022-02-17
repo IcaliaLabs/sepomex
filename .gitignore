@@ -1,10 +1,10 @@
 .DS_Store
-/config/database.yml
-*.keep
-.ruby-version
-deploy/
+
 /db/development.sqlite3
 /log/development.log
 /tmp
 tmp/cache/bootsnap-load-path-cache
 log/test.log
+
+docker-compose.override.yml
+tmp/cache

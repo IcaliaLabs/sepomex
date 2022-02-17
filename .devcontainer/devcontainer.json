@@ -1,0 +1,78 @@
+// See https://code.visualstudio.com/docs/remote/containers#_devcontainerjson-reference
+{
+  // General ===================================================================
+
+  // A display name for the container.
+  "name": "Sepomex RESTAPI",
+
+  // A command string or list of command arguments to run after the container is
+  // created. The commands execute from the workspaceFolder in the container.
+  // Use && in a string to execute multiple commands. For example,
+  // "yarn install" or "apt-get update && apt-get install -y git". The array
+  // syntax ["yarn", "install"] will invoke the command (in this case yarn)
+  // directly without using a shell.
+  //
+  // It fires after your source code has been mounted, so you can also run shell
+  // scripts from your source tree. For example:
+  // bash scripts/install-dev-tools.sh. Not set by default.
+  // "postCreateCommand": "dev-entrypoint.sh check-node-modules-owner",
+
+  // Dockerfile Compose Config =================================================
+
+  // Required. Path or an ordered list of paths to Docker Compose files relative
+  // to the devcontainer.json file. Using an array is useful when extending your
+  // Docker Compose configuration. The order of the array matters since the
+  // contents of later files can override values set in previous ones.
+  "dockerComposeFile": [
+    "../docker-compose.yml", // The compose file with the common services
+    "docker-compose.yml"     // Special for the VSCode dev container
+  ],
+
+  "shutdownAction": "stopCompose",
+
+  "postCreateCommand": "bin/dev-entrypoint rails db:migrate:status",
+
+  // Required. The name of the service VS Code should connect to once running.
+  "service": "development",
+
+  // Only bring up the services required by the development container - VSCode
+  // will bring up all services unless this is configured:
+  "runServices": [
+    "postgres"
+  ],
+
+  "workspaceFolder": "/workspaces/sepomex",
+
+  // An array of extension IDs that specify the extensions to install inside the
+  // container when you first attach to it.
+  "extensions": [
+    // Integrates ESLint into VS Code:
+    "dbaeumer.vscode-eslint",
+
+    // Provides enhanced Ruby language and debugging support for Visual Studio
+    // Code:
+    "rebornix.ruby",
+
+    // execute rubocop for current Ruby code.
+    "misogi.ruby-rubocop",
+
+    // A language server that provides intellisense, code completion, and inline
+    // documentation for Ruby:
+    "castwide.solargraph",
+
+    // Search modules, class and methods in ruby files using vscode go to symbol:
+    "miguel-savignano.ruby-symbols",
+
+    // Git Lens:
+    "eamodio.gitlens",
+
+    // Github Pull Requests and Issues:
+    "github.vscode-pull-request-github",
+
+    // Remotely browse and edit any GitHub repository:
+    "github.remotehub",
+
+    // GitHub Copilot:
+    "github.copilot"
+  ]
+}

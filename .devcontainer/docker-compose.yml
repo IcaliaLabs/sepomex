@@ -1,0 +1,18 @@
+volumes:
+  vscode_extensions:
+  vscode_insiders_extensions:
+
+services:
+  development:
+    volumes:
+      - vscode_extensions:/home/${USER:-you}/.vscode-server/extensions
+      - vscode_insiders_extensions:/home/${USER:-you}/.vscode-server-insiders/extensions
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+    environment:
+      VSCODE_CONTEXT: "yes"
+
+      # Use VSCode as editor:
+      EDITOR: code -w

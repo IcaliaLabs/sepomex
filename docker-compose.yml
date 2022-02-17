@@ -1,31 +1,79 @@
-version: "3.7"
-
 volumes:
   postgres_data:
 
-networks:
-  backend:
-
 services:
   postgres:
-    image: postgres:10.6-alpine
+    image: postgres:12.9-alpine
     volumes:
       # We'll store the postgres data in the 'postgres_data' volume we defined:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+    ports:  
+      - published: ${SEPOMEX_PG_PORT:-5432}
+        target: 5432
     environment:
-      POSTGRES_PASSWORD: 3x4mpl3P455w0rd
+      POSTGRES_USER: ${USER:-you}
+      POSTGRES_HOST_AUTH_METHOD: trust
 
-  # Where are the rest of the app services? (i.e. test, worker, web, etc)
-  #
-  # We've separated the app services from the rest of the services to streamline
-  # the CI/CD pipeline execution. You'll find the app service definitions on the
-  # `docker-compose.override.yml` file.
-  #
-  # You don't have to do anything special to docker-compose or plis to make the
-  # project work as usual. By default, `docker-compose` will read
-  # `docker-compose.yml` and `docker-compose.override.yml` files, merging their
-  # contents before doing any actual work.
-  #
-  # See https://docs.docker.com/compose/extends/#understanding-multiple-compose-files
+  # The tests container:
+  tests: &app
+    build: &app_build
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        DEVELOPER_UID: ${UID:-1000}
+        DEVELOPER_USERNAME: ${USER:-you}
+    image: icalialabs/sepomex:development
+
+    volumes:
+      # Mount the app code into the app containers:
+      - .:/workspaces/sepomex
+
+    # Keep the stdin open, so we can attach to our app container's process
+    # and do things such as byebug, etc:
+    stdin_open: true
+
+    # Enable sending signals (CTRL+C, CTRL+P + CTRL+Q) into the container:
+    tty: true
+
+    # Required for ptrace-based debuggers like C++, Go, and Rust
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+    security_opt:
+      - seccomp:unconfined
+
+    # entrypoint: /workspaces/sepomex/bin/dev-entrypoint
+
+    # Link to our postgres and redis services, so they can be visible from our
+    # app service containers:
+    depends_on:
+      - postgres
+
+    # The command we want to execute by default when running the container
+    command: rspec
+
+    # Specify environment variables available for our app containers. We'll
+    # leave a YML anchor in case we need to override or add more variables if
+    # needed on each app service:
+    environment: &app_env
+      RAILS_LOG_TO_STDOUT: "true"
+
+      DEBIAN_FRONTEND: dialog
+
+      DATABASE_URL: postgres://postgres:5432/?encoding=unicode
+      
+  # The development container:
+  development:
+    <<: *app
+
+    ports:
+      - ${SEPOMEX_WEB_PORT:-4201}:${SEPOMEX_WEB_PORT:-4201}
+
+    # The command we want to execute by default when running the container
+    command: rails server -b 0.0.0.0
+    environment:
+      <<: *app_env
+      PORT: ${SEPOMEX_WEB_PORT:-4201}

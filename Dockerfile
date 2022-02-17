@@ -1,219 +1,267 @@
-# I: Runtime Stage: ============================================================
-# This is the stage where we build the runtime base image, which is used as the
-# common ancestor by the rest of the stages, and contains the minimal runtime
-# dependencies required for the application to run:
+# Stage 1: Runtime =============================================================
+# The minimal package dependencies required to run the app in the release image:
 
-# Step 1: Use the official Ruby 2.7.1 Slim Buster image as
-# base:
-FROM ruby:2.7.1-slim-buster AS runtime
+# Use the official Ruby 2.7.5 Slim Bullseye image as base:
+FROM ruby:2.7.5-slim-bullseye AS runtime
 
-# Step 2: We'll set the MALLOC_ARENA_MAX for optimization purposes & prevent memory bloat
+# We'll set MALLOC_ARENA_MAX for optimization purposes & prevent memory bloat
 # https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html
 ENV MALLOC_ARENA_MAX="2"
 
-# Step 3: We'll set the LANG encoding to be UTF-8 for special characters support
-ENV LANG C.UTF-8
-
-# Step 4: We'll install curl for later dependencies installations
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    curl
-
-# Step 5: Add nodejs source
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-
-# Step 7: Install the common runtime dependencies:
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    apt-transport-https software-properties-common \
+# We'll install curl for later dependency package installation steps
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl \
     libpq5 \
     openssl \
-    nodejs \
-    tzdata && \
-    rm -rf /var/lib/apt/lists/*
+    # Required by mimemagic gem:
+    shared-mime-info \
+    tzdata \
+ && rm -rf /var/lib/apt/lists/*
 
-# Step 8: Add Dockerize image
-RUN export DOCKERIZE_VERSION=v0.6.1 && curl -L \
-    https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    | tar -C /usr/local/bin -xz
+# Stage 2: development-base ====================================================
+# This stage will contain the minimal dependencies for the rest of the images
+# used to build the project:
 
-# II: Development Stage: =======================================================
-# In this stage we'll build the image used for development, including compilers,
-# and development libraries. This is also a first step for building a releasable
-# Docker image:
+# Use the "runtime" stage as base:
+FROM runtime AS development-base
 
-# Step 9: Start off from the "runtime" stage:
-FROM runtime AS development
-
-# Step 10: Set the default command:
-CMD [ "rails", "server", "-b", "0.0.0.0" ]
-
-# Step 11: Install the development dependency packages with alpine package
-# manager:
+# Install the app build system dependency packages - we won't remove the apt
+# lists from this point onward:
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     build-essential \
-    chromium \
-    chromium-driver \
     git \
-    graphviz \
-    libpq-dev \
-    net-tools \
-    # Install sudo to step-up as root ON DEVELOPMENT STAGE ONLY!
-    sudo \
- && rm -rf /var/lib/apt/lists/*
+    libpq-dev
 
-# Step 12: Build the su-exec executable - used to step-down from root on final
-# image. This might actually be a runtime requirement, but since we need to
-# build it, and maybe have it available at development time to test our scripts,
-# it's built in this stage. We'll copy it into the final image in the release
-# stage:
-RUN curl -o /usr/local/bin/su-exec.c https://raw.githubusercontent.com/ncopa/su-exec/master/su-exec.c \
- && gcc -Wall /usr/local/bin/su-exec.c -o/usr/local/bin/su-exec \
- && chown root:root /usr/local/bin/su-exec \
- && chmod 0755 /usr/local/bin/su-exec \
- && rm /usr/local/bin/su-exec.c
-
-# Step 13: Install the 'check-dependencies' node package:
-RUN npm install -g check-dependencies
-
-# Step 14: Receive the developer user's UID - typically 1000:
+# Receive the developer user's UID and USER:
 ARG DEVELOPER_UID=1000
-
-# Step 15: Receive the developer user's GID - typically the same as the UID:
-ARG DEVELOPER_GID=1000
-
-# Step 16: Receive the developer user's username:
 ARG DEVELOPER_USERNAME=you
 
-# Step 17: Set the developer's UID as an environment variable:
-ENV DEVELOPER_UID=${DEVELOPER_UID} \
-    DEVELOPER_GID=${DEVELOPER_GID} \
-    DEVELOPER_USERNAME=${DEVELOPER_USERNAME}
+# Replicate the developer user in the development image:
+RUN addgroup --gid ${DEVELOPER_UID} ${DEVELOPER_USERNAME} \
+ ;  useradd -r -m -u ${DEVELOPER_UID} --gid ${DEVELOPER_UID} \
+    --shell /bin/bash -c "Developer User,,," ${DEVELOPER_USERNAME}
 
-# Step 18: Create the developer group and user:
-RUN addgroup --gid ${DEVELOPER_GID} ${DEVELOPER_USERNAME} \
- ; useradd -r -m -u ${DEVELOPER_UID} --gid ${DEVELOPER_GID} -d /code \
-   -c "Developer User,,," ${DEVELOPER_USERNAME}
+# Ensure the developer user's home directory and app path are owned by him/her:
+# (A workaround to a side effect of setting WORKDIR before creating the user)
+RUN userhome=$(eval echo ~${DEVELOPER_USERNAME}) \
+ && chown -R ${DEVELOPER_USERNAME}:${DEVELOPER_USERNAME} $userhome \
+ && mkdir -p /workspaces/sepomex \
+ && chown -R ${DEVELOPER_USERNAME}:${DEVELOPER_USERNAME} /workspaces/sepomex
 
-# Step 19: Add the developer user to the sudoers list:
-RUN echo "${DEVELOPER_USERNAME} ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/${DEVELOPER_USERNAME}"
+# Add the app's "bin/" directory to PATH:
+ENV PATH=/workspaces/sepomex/bin:$PATH
 
-# Step 20: Create the `/usr/src` folder, and change set the developer user as
-# it's owner:
-RUN mkdir -p /usr/src && chown -R ${DEVELOPER_UID}:${DEVELOPER_GID} /usr/src
+# Set the app path as the working directory:
+WORKDIR /workspaces/sepomex
 
-# Step 21: Change to the developer user:
+# Change to the developer user:
 USER ${DEVELOPER_USERNAME}
 
-# Step 22: Set the current working dir to `/usr/src` - we'll actually override
-# this on the docker-compose files:
-WORKDIR /usr/src
+# Configure bundler to retry downloads 3 times:
+RUN bundle config set --local retry 3
 
-# Step 23: Copy the project's Gemfile + lock:
-COPY Gemfile* /usr/src/
+# Configure bundler to use 4 threads to download, build and install:
+RUN bundle config set --local jobs 4
 
-# Step 24: Install the current project gems - they can be safely changed later
-# during development via `bundle install` or `bundle update`:
-RUN bundle install --jobs=4 --retry=3
+# Stage 3: Testing =============================================================
+# In this stage we'll complete an image with the minimal dependencies required
+# to run the tests in a continuous integration environment.
+FROM development-base AS testing
 
-# III: Testing stage: ==========================================================
-# In this stage we'll add the current code from the project's source, so we can
-# run tests with the code.
+# Copy the project's Gemfile and Gemfile.lock files:
+COPY --chown=${DEVELOPER_USERNAME} Gemfile* /workspaces/sepomex/
 
-# Step 27: Start off from the development stage image:
-FROM development AS testing
+# Configure bundler to exclude the gems from the "development" group when
+# installing, so we get the leanest Docker image possible to run tests:
+RUN bundle config set --local without development
 
-# Step 28: Copy the rest of the application code
-COPY . /usr/src
+# Install the project gems, excluding the "development" group:
+RUN bundle install
 
-# Step 29: Add the /usr/src/bin directory to $PATH:
-ENV PATH=/usr/src/bin:$PATH DEBIAN_FRONTEND=noninteractive
+# Stage 4: Development =========================================================
+# In this stage we'll add the packages, libraries and tools required in our
+# day-to-day development process.
 
-# IV: Builder stage: ===========================================================
-# In this stage we'll compile assets coming from the project's source, do some
-# tests and cleanup. If the CI/CD that builds this image allows it, we should
-# also run the app test suites here:
+# Use the "development-base" stage as base:
+FROM development-base AS development
 
-# Step 30: Start off from the development stage image:
+# Change to root user to install the development packages:
+USER root
+
+# Install sudo, along with any other tool required at development phase:
+RUN apt-get install -y --no-install-recommends \
+  # Adding bash autocompletion as git without autocomplete is a pain...
+  bash-completion \
+  # gpg & gpgconf is used to get Git Commit GPG Signatures working inside the
+  # VSCode devcontainer:
+  gpg \
+  openssh-client \
+  # Para esperar a que el servicio de minio (u otros) esté disponible:
+  netcat \
+  # /proc file system utilities: (watch, ps):
+  procps \
+  # Vim will be used to edit files when inside the container (git, etc):
+  vim \
+  # Sudo will be used to install/configure system stuff if needed during dev:
+  sudo
+
+# Receive the developer username argument again, as ARGS won't persist between
+# stages on non-buildkit builds:
+ARG DEVELOPER_USERNAME=you
+
+# Add the developer user to the sudoers list:
+RUN echo "${DEVELOPER_USERNAME} ALL=(ALL) NOPASSWD:ALL" | tee "/etc/sudoers.d/${DEVELOPER_USERNAME}"
+
+# Persist the bash history between runs
+# - See https://code.visualstudio.com/docs/remote/containers-advanced#_persist-bash-history-between-runs
+RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/command-history/.bash_history" \
+ && mkdir /command-history \
+ && touch /command-history/.bash_history \
+ && chown -R ${DEVELOPER_USERNAME} /command-history \
+ && echo $SNIPPET >> "/home/${DEVELOPER_USERNAME}/.bashrc"
+
+# Create the extensions directories:
+RUN mkdir -p \
+  /home/${DEVELOPER_USERNAME}/.vscode-server/extensions \
+  /home/${DEVELOPER_USERNAME}/.vscode-server-insiders/extensions \
+ && chown -R ${DEVELOPER_USERNAME} \
+  /home/${DEVELOPER_USERNAME}/.vscode-server \
+  /home/${DEVELOPER_USERNAME}/.vscode-server-insiders
+
+# Change back to the developer user:
+USER ${DEVELOPER_USERNAME}
+
+# Copy the gems installed in the "testing" stage:
+COPY --from=testing /usr/local/bundle /usr/local/bundle
+COPY --from=testing /workspaces/sepomex/ /workspaces/sepomex/
+
+# Configure bundler to not exclude any gem group, so we now get all the gems
+# specified in the Gemfile:
+RUN bundle config unset --local without
+
+# Install the full gem list:
+RUN bundle install
+
+# Stage 5: Asset Precompilation ================================================
+# We'll copy the minimal set of files required by rails to precompile the app
+# assets:
+FROM testing AS asset-precompilation
+
+# Receive the developer username argument again, as ARGS won't persist between
+# stages on non-buildkit builds:
+ARG DEVELOPER_USERNAME=you
+
+# Copy all the files required for the asset compilation:
+COPY --chown=${DEVELOPER_USERNAME} vendor /workspaces/sepomex/vendor
+COPY --chown=${DEVELOPER_USERNAME} app/assets /workspaces/sepomex/app/assets
+COPY --chown=${DEVELOPER_USERNAME} app/javascript /workspaces/sepomex/app/javascript
+COPY --chown=${DEVELOPER_USERNAME} bin/rails /workspaces/sepomex/bin/
+COPY --chown=${DEVELOPER_USERNAME} Rakefile /workspaces/sepomex/
+COPY --chown=${DEVELOPER_USERNAME} config/initializers/assets.rb /workspaces/sepomex/config/initializers/assets.rb
+COPY --chown=${DEVELOPER_USERNAME} config/environments/production.rb /workspaces/sepomex/config/environments/production.rb
+COPY --chown=${DEVELOPER_USERNAME} config/application.rb config/boot.rb config/environment.rb /workspaces/sepomex/config/
+
+# Compile the assets:
+RUN RAILS_ENV=production SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails assets:precompile
+
+# Stage 6: Builder =============================================================
+# In this stage we'll add the rest of the code, compile assets, and perform a
+# cleanup for the releasable image.
+
+# Use the "testing" stage as base:
 FROM testing AS builder
 
-# Step 31: Precompile assets:
-RUN export DATABASE_URL=postgres://postgres@example.com:5432/fakedb \
-    SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece \
-    RAILS_ENV=production && \
-    rails assets:precompile && \
-    rails webpacker:compile && \
-    rails secret > /dev/null
+# Receive the developer username argument again, as ARGS won't persist between
+# stages on non-buildkit builds:
+ARG DEVELOPER_USERNAME=you
 
-# Step 32: Remove installed gems that belong to the development & test groups -
-# we'll copy the remaining system gems into the deployable image on the next
-# stage:
-RUN bundle config without development:test && bundle clean --force
+# Configure bundler to exclude the gems from the "development" and "test" groups
+# from the installed gemset, which should set them out to remove on cleanup:
+RUN bundle config set --local without development test
 
-# Step 33: Remove files not used on release image:
+# Cleanup the gems excluded from the current configuration. We'll copy the
+# remaining gemset into the deployable image on the next stage:
+RUN bundle clean --force
+
+# Copy the full contents of the project:
+COPY --chown=${DEVELOPER_USERNAME} . /workspaces/sepomex/
+
+# Copy the precompiled assets:
+COPY --from=asset-precompilation --chown=${DEVELOPER_USERNAME} /workspaces/sepomex /workspaces/sepomex
+
+# Change to root, before performing the final cleanup:
+USER root
+
+# Remove unneeded gem cache files (cached *.gem, *.o, *.c):
+RUN rm -rf /usr/local/bundle/cache/*.gem \
+ && find /usr/local/bundle/gems/ -name "*.c" -delete \
+ && find /usr/local/bundle/gems/ -name "*.o" -delete
+
+# Remove project files not used on release image - be aware that files on git
+# might still be copied to the image, regardless of rules in the .dockerignore
+# file, whenever the image is being built on a Git context.
+# - See https://docs.docker.com/engine/reference/commandline/build/#git-repositories
 RUN rm -rf \
+    .codeclimate.yml \
+    .devcontainer \
+    .dockerignore \
+    .gitattributes \
+    .github \
+    .gitignore \
+    .reek.yml \
     .rspec \
+    .rubocop.yml \
+    .simplecov \
+    .vscode \
     Guardfile \
     bin/rspec \
-    bin/checkdb \
     bin/dumpdb \
     bin/restoredb \
     bin/setup \
-    bin/spring \
-    bin/update \
-    bin/dev-entrypoint.sh \
-    config/spring.rb \
-    node_modules \
+    bin/dev-entrypoint \
+    ci-compose.yml \
+    db/dumps \
+    db/seeds/development.rb \
+    doc \
+    docker-compose.yml \
+    Dockerfile \
+    log/production.log \
     spec \
-    config/initializers/listen_patch.rb \
-    tmp/*
+    staging-compose.yml
 
-# V: Release stage: ============================================================
-# In this stage, we build the final, deployable Docker image, which will be
-# smaller than the images generated on previous stages:
+# Stage 7: Release =============================================================
+# In this stage, we build the final, releasable, deployable Docker image, which
+# should be smaller than the images generated on previous stages:
 
-# Step 34: Start off from the runtime stage image:
+# Use the "runtime" stage as base:
 FROM runtime AS release
 
-# Step 35: Copy the remaining installed gems from the "builder" stage:
+# Copy the remaining installed gems from the "builder" stage:
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 
-# Step 36: Copy the `su-exec` command, which may be needed if you require the
-# production container to start as root and then step down to an unprivileged
-# user:
-COPY --from=builder /usr/local/bin/su-exec /usr/local/bin/su-exec
+# Copy the app code and compiled assets from the "builder" stage to the
+# final destination at /workspaces/sepomex:
+COPY --from=builder --chown=nobody:nogroup /workspaces/sepomex /workspaces/sepomex
 
-# Step 37: Copy the app code and compiled assets from the "builder" stage to the
-# final destination at /srv/sepomex:
-COPY --from=builder --chown=nobody:nogroup /usr/src /srv/sepomex
-
-# Step 38: Set the container user to 'nobody':
+# Set the container user to 'nobody':
 USER nobody
 
-# Step 39: Set the RAILS/RACK_ENV and PORT default values:
-ENV PATH=/srv/sepomex/bin:$PATH RAILS_ENV=production RACK_ENV=production PORT=3000 DEBIAN_FRONTEND=dialog
+# Set the RAILS and PORT default values:
+ENV HOME=/workspaces/sepomex \
+    RAILS_ENV=production \
+    RAILS_FORCE_SSL=yes \
+    RAILS_LOG_TO_STDOUT=yes \
+    RAILS_SERVE_STATIC_FILES=yes \
+    PORT=3000
 
-# Step 40: Generate the temporary directories in case they don't already exist:
-RUN mkdir -p /srv/sepomex/tmp \
- && cd /srv/sepomex/tmp \
- && mkdir -p cache pids sockets storage
+# Test if the rails app loads:
+RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 
-# Step 41: Set the default command:
+# Set the installed app directory as the working directory:
+WORKDIR /workspaces/sepomex
+
+# Set the default command:
 CMD [ "puma" ]
-
-# Step 42 thru 46: Add label-schema.org labels to identify the build info:
-ARG SOURCE_BRANCH="master"
-ARG SOURCE_COMMIT="000000"
-ARG BUILD_DATE="2017-09-26T16:13:26Z"
-ARG IMAGE_NAME="sepomex:latest"
-
-LABEL org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.name="Sepomex" \
-      org.label-schema.description="Sepomex" \
-      org.label-schema.vcs-url="https://github.com/IcaliaLabs/sepomex.git" \
-      org.label-schema.vcs-ref=$SOURCE_COMMIT \
-      org.label-schema.schema-version="1.0.0-rc1" \
-      build-target="release" \
-      build-branch=$SOURCE_BRANCH
