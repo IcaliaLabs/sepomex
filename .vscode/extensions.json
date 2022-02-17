@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    // Open any folder inside (or mounted into) a container and take advantage
+    // of Visual Studio Code's full feature set.
+    "ms-vscode-remote.remote-containers"
+  ]
+}

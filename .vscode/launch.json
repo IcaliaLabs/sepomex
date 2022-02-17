@@ -1,0 +1,24 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  //
+  // Also, for variables reference: https://code.visualstudio.com/docs/editor/variables-reference
+  //
+  // For the Ruby plugin: https://github.com/rubyide/vscode-ruby/wiki/2.-Launching-from-VS-Code
+  //
+  // We shouldn't include the webpacker's webpack-dev-server in these configurations,
+  // as the ruby process that launches it terminates, leaving the node webpack dev
+  // server running...
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Rails server",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/rails",
+      "args": [ "server", "-b", "0.0.0.0" ],
+      "debuggerPort": "1234"
+    }
+  ]
+}
