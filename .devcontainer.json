@@ -23,17 +23,15 @@
   // to the devcontainer.json file. Using an array is useful when extending your
   // Docker Compose configuration. The order of the array matters since the
   // contents of later files can override values set in previous ones.
-  "dockerComposeFile": [
-    "../docker-compose.yml", // The compose file with the common services
-    "docker-compose.yml"     // Special for the VSCode dev container
-  ],
+  "dockerComposeFile": "docker-compose.yml",
 
-  "shutdownAction": "stopCompose",
-
-  "postCreateCommand": "bin/dev-entrypoint rails db:migrate:status",
 
   // Required. The name of the service VS Code should connect to once running.
-  "service": "development",
+  "service": "devcontainer",
+
+  "overrideCommand": true,
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "bin/dev-entrypoint rails db:migrate:status",
 
   // Only bring up the services required by the development container - VSCode
   // will bring up all services unless this is configured:
