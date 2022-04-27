@@ -1,5 +1,7 @@
 volumes:
   postgres_data:
+  vscode_extensions:
+  vscode_insiders_extensions:
 
 services:
   postgres:
@@ -9,15 +11,16 @@ services:
       - type: volume
         source: postgres_data
         target: /var/lib/postgresql/data
-    ports:  
+    ports:
       - published: ${SEPOMEX_PG_PORT:-5432}
         target: 5432
     environment:
       POSTGRES_USER: ${USER:-you}
       POSTGRES_HOST_AUTH_METHOD: trust
 
-  # The tests container:
-  tests: &app
+  # The default development container:
+  rails: &app
+    image: icalialabs/sepomex:development
     build: &app_build
       context: .
       dockerfile: Dockerfile
@@ -25,7 +28,6 @@ services:
       args:
         DEVELOPER_UID: ${UID:-1000}
         DEVELOPER_USERNAME: ${USER:-you}
-    image: icalialabs/sepomex:development
 
     volumes:
       # Mount the app code into the app containers:
@@ -52,8 +54,10 @@ services:
     depends_on:
       - postgres
 
-    # The command we want to execute by default when running the container
-    command: rspec
+    command: rails s -b 0.0.0.0
+
+    ports:
+      - ${SEPOMEX_WEB_PORT:-4201}:3000
 
     # Specify environment variables available for our app containers. We'll
     # leave a YML anchor in case we need to override or add more variables if
@@ -64,16 +68,33 @@ services:
       DEBIAN_FRONTEND: dialog
 
       DATABASE_URL: postgres://postgres:5432/?encoding=unicode
-      
-  # The development container:
-  development:
-    <<: *app
 
-    ports:
-      - ${SEPOMEX_WEB_PORT:-4201}:${SEPOMEX_WEB_PORT:-4201}
+  # The tests container:
+  tests:
+    <<: *app
+    build:
+      <<: *app_build
+      target: testing
 
     # The command we want to execute by default when running the container
-    command: rails server -b 0.0.0.0
+    command: rspec
+
+    ports: []
+    profiles: [ci, tests]
+
+  # This container is used by Visual Studio Code + Remote Container:
+  devcontainer:
+    <<: *app
+    profiles: [vscode]
+
+    volumes:
+      - .:/workspaces/sepomex
+      - vscode_extensions:/home/${USER:-you}/.vscode-server/extensions
+      - vscode_insiders_extensions:/home/${USER:-you}/.vscode-server-insiders/extensions
     environment:
       <<: *app_env
-      PORT: ${SEPOMEX_WEB_PORT:-4201}
+      VSCODE_CONTEXT: "yes"
+
+      # Use VSCode as editor:
+      EDITOR: code -w
+
