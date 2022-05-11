@@ -31,6 +31,12 @@ gem 'pagy', '~> 3.8', '>= 3.8.2'
 gem 'rack-cors', '~> 1.1', '>= 1.1.1'
 # Testing
 
+# Creates and controls a Chromium instance
+gem "ferrum"
+
+# Manages .zip files
+gem 'rubyzip'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
