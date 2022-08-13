@@ -15,6 +15,10 @@ if command_requires_setup?
       setup_activerecord_database unless activerecord_database_ready?
     end
 
+    if %w[rspec].include?(ARGV[0])
+      system 'rails db:test:prepare'
+    end
+
     remove_rails_pidfile if rails_server?
   end
 end
