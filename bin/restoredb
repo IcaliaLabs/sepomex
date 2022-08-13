@@ -1,0 +1,20 @@
+#! /bin/bash
+
+# For use on the postgres container only.
+set -e
+
+: ${DB_NAME:=$1}
+: ${DB_DUMP_PATH:=$2}
+: ${PGUSER:=postgres}
+
+# echo "==============================="
+# echo "PGUSER: ${PGUSER}"
+# echo "PGHOST: ${PGHOST}"
+# echo "PGPORT: ${PGPORT}"
+# echo "PGPASSWORD: *hidden*"
+# echo "==============================="
+
+dropdb -U $PGUSER -e --if-exists $DB_NAME && \
+createdb -U $PGUSER $1 && \
+pg_restore -U $PGUSER --clean --no-owner --no-privileges --verbose --jobs=2 \
+ --dbname=$DB_NAME $DB_DUMP_PATH
