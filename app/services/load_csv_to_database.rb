@@ -16,9 +16,9 @@ class LoadCsvToDatabase
 
   def perform!
     update_zip_code_table
-    update_states_table
-    update_municipalities_table
-    update_cities_table
+    UpdateStatesTable.perform! self
+    UpdateMunicipalitiesTable.perform! self
+    UpdateCitiesTable.perform! self
   end
 
   def on_load_progress(&block)
@@ -112,57 +112,6 @@ class LoadCsvToDatabase
     insert_zip_codes
     update_zip_codes
     notify_load_progress '..."zip_codes" updating finished'
-  end
-
-  def state_import_cte
-    <<~SQL.squish
-      WITH "input_data" AS (
-        SELECT "c_estado"::integer AS "id", "d_estado" AS "name"
-        FROM "zip_codes"
-        GROUP BY "d_estado", "c_estado"
-        ORDER BY "c_estado"::integer
-      ), "updates" AS (
-        SELECT
-          "states"."id",
-          "input_data"."name",
-          "input_data"."id" as "id_on_import_data"
-        FROM
-          "input_data"
-          LEFT JOIN "states" ON "input_data"."id" = "states"."id"
-      )
-    SQL
-  end
-
-  def insert_states
-    database_execute <<~SQL.squish
-      #{state_import_cte}
-      INSERT INTO "states" ("id", "name", "cities_count")
-      SELECT "id_on_import_data", "name", 0
-      FROM "updates" WHERE "id" IS NULL
-    SQL
-  end
-
-  def update_states
-    database_execute <<~SQL.squish
-      #{state_import_cte}
-      UPDATE "states" SET "name" = "updates"."name"
-      FROM "updates" WHERE "states"."id" = "updates"."id"
-    SQL
-  end
-
-  def update_states_table
-    notify_load_progress 'Creating states...'
-    insert_states
-    update_states
-    notify_load_progress 'Done!'
-  end
-
-  def update_municipalities_table
-    UpdateMunicipalitiesTable.perform! self
-  end
-
-  def update_cities_table
-    UpdateCitiesTable.perform! self
   end
 
   def notify_load_progress(*args)
