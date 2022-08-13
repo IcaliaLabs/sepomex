@@ -16,15 +16,24 @@ class LoadCsvToDatabase
 
     def state_import_cte
       <<~SQL.squish
-        WITH "input_data" AS (
-          SELECT DISTINCT ON ("c_estado"::integer)
-            "d_estado" AS "name", "c_estado"::integer AS "inegi_state_code"
-          FROM "zip_codes"
-          ORDER BY "c_estado"::integer
+        WITH "input_source" AS (
+          #{ZipCode.cities_data.to_sql}
+        ), "city_counts" AS (
+          SELECT "c_estado", COUNT(*) AS "cities_count"
+          FROM "input_source" GROUP BY "c_estado"
+        ), "normalized_rows" AS (
+          SELECT DISTINCT
+            "i"."d_estado" AS "name",
+            "c"."cities_count",
+            "i"."c_estado"::INT AS "inegi_state_code"
+          FROM
+            "input_source" AS "i"
+            INNER JOIN "city_counts" AS "c" ON
+              "i"."c_estado" = "c"."c_estado"
         ), "updates" AS (
           SELECT "s"."id", "i".*
           FROM
-            "input_data" AS "i"
+            "normalized_rows" AS "i"
             LEFT JOIN "states" AS "s" ON
               "i"."inegi_state_code" = "s"."inegi_state_code"
         )
@@ -35,7 +44,7 @@ class LoadCsvToDatabase
       database_execute <<~SQL.squish
         #{state_import_cte}
         INSERT INTO "states" ("name", "cities_count", "inegi_state_code")
-        SELECT "name", 0, "inegi_state_code"
+        SELECT "name", "cities_count", "inegi_state_code"
         FROM "updates" WHERE "id" IS NULL
       SQL
     end
@@ -44,9 +53,8 @@ class LoadCsvToDatabase
       database_execute <<~SQL.squish
         #{state_import_cte}
         UPDATE "states"
-        SET
-          "name" = "updates"."name"
-        FROM "updates" WHERE "states"."id" = "updates"."id"
+        SET "name" = "u"."name", "cities_count" = "u"."cities_count"
+        FROM "updates" AS "u" WHERE "states"."id" = "u"."id"
       SQL
     end
   end
