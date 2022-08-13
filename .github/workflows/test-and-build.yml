@@ -1,0 +1,100 @@
+# (Copied from IcaliaLabs/portal)
+
+on:
+  workflow_call:
+    outputs:
+      git-commit-short-sha:
+        description: "The Git commit short SHA"
+        value: ${{ jobs.test-and-build.outputs.git-commit-short-sha }}
+      container-image-digest:
+        description: "The Docker image digest which uniquely identifies the built image"
+        value: ${{ jobs.test-and-build.outputs.container-image-digest }}
+
+# On this project, I went with a single "Test & Build" job, since each job
+# gets billed rounded to the next minute, and having multiple separated jobs
+# is not worth it at the beginning of the project.
+
+# Keep in mind that, if the test suite becomes too big, and test threading is
+# required, or the workflow speed becomes critial, we might need to revert back
+# to separated jobs.
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+
+    outputs:
+      git-commit-short-sha: ${{ steps.variables.outputs.git-commit-short-sha }}
+      container-image-digest: ${{ steps.build-and-push-release-image.outputs.digest }}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3.0.2
+
+      - # We'll generate a unique id that we'll use to identify the build run
+        # on our systems
+        name: Generate UUID for build
+        id: uuidgen
+        run: echo "::set-output name=uuid::$(uuidgen)"
+
+      - name: Set additional variables
+        id: variables
+        uses: icalia-actions/common-variables@v0.0.3
+
+      - name: Set build timestamp
+        id: set-build-timestamp
+        run: echo "::set-output name=timestamp::$(date +%s)"
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2.0.0
+
+      - name: Build Test Image
+        id: build-test-image
+        uses: docker/build-push-action@v3.1.1
+        with:
+          load: true
+          target: testing
+          platforms: linux/amd64
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
+            DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
+          tags: |
+            icalialabs/sepomex-web:testing-${{ steps.variables.outputs.git-dasherized-branch }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run tests
+        env:
+          UID: ${{ steps.variables.outputs.runner-uid }}
+          USER: ${{ steps.variables.outputs.runner-user }}
+          TESTING_IMAGE_TAG: ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
+        run: docker compose run --rm tests
+
+      - name: Archive system spec screenshots
+        uses: actions/upload-artifact@v3.1.0
+        if: always()
+        with:
+          name: system-spec-screenshots
+          retention-days: 7
+          path: |
+            tmp/capybara/screenshots
+
+      - name: Build & Push Release Image
+        id: build-and-push-release-image
+        uses: docker/build-push-action@v3.1.1
+        with:
+          push: false
+          target: release
+          platforms: linux/amd64
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
+            DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
+          tags: |
+            us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:${{ steps.variables.outputs.git-commit-short-sha }}
+            us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:${{ steps.variables.outputs.git-dasherized-branch }}
+            us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

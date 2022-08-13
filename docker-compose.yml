@@ -20,8 +20,8 @@ services:
 
   # The default development container:
   development: &app
-    image: icalialabs/sepomex:development
-    build: &app_build
+    image: icalialabs/sepomex-web:development
+    build: &app-build
       context: .
       dockerfile: Dockerfile
       target: development
@@ -72,8 +72,10 @@ services:
   # The tests container:
   tests:
     <<: *app
+
+    image: icalialabs/sepomex-web${TESTING_IMAGE_TAG:-:testing}
     build:
-      <<: *app_build
+      <<: *app-build
       target: testing
 
     # The command we want to execute by default when running the container
@@ -99,3 +101,15 @@ services:
       # Use VSCode as editor:
       EDITOR: code -w
 
+  staging-web:
+    <<: *app
+
+    image: icalialabs/sepomex-web:latest
+    build:
+      <<: *app-build
+      target: release
+
+    # The command we want to execute by default when running the container
+    command: rspec
+
+    profiles: [staging]

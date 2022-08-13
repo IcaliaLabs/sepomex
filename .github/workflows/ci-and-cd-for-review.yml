@@ -1,0 +1,12 @@
+name: Review
+
+on:
+  # Trigger the workflow on activity over any pull request to main:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    name: Integration
+    uses: ./.github/workflows/test-and-build.yml
