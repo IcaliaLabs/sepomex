@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_01_215345) do
+ActiveRecord::Schema.define(version: 2022_08_13_184618) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,8 @@ ActiveRecord::Schema.define(version: 2020_07_01_215345) do
   create_table "cities", force: :cascade do |t|
     t.string "name", null: false
     t.integer "state_id", null: false
+    t.integer "sepomex_city_code", limit: 2, null: false
+    t.index ["state_id", "sepomex_city_code"], name: "index_cities_on_state_id_and_sepomex_city_code", unique: true
   end
 
   create_table "municipalities", force: :cascade do |t|
@@ -26,12 +28,15 @@ ActiveRecord::Schema.define(version: 2020_07_01_215345) do
     t.string "municipality_key", null: false
     t.string "zip_code", null: false
     t.integer "state_id"
+    t.index ["state_id", "municipality_key"], name: "index_municipalities_on_state_id_and_municipality_key", unique: true
     t.index ["state_id"], name: "index_municipalities_on_state_id"
   end
 
   create_table "states", force: :cascade do |t|
     t.string "name", null: false
     t.integer "cities_count", null: false
+    t.integer "inegi_state_code", limit: 2, null: false
+    t.index ["inegi_state_code"], name: "index_states_on_inegi_state_code", unique: true
   end
 
   create_table "zip_codes", force: :cascade do |t|
