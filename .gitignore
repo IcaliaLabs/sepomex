@@ -8,3 +8,10 @@ log/test.log
 
 docker-compose.override.yml
 tmp/cache
+
+# Ignore history files
+**/.*_hist*
+
+# Ignore database dumps
+db/dumps/*
+!db/dumps/.keep
