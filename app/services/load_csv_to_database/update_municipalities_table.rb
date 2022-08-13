@@ -9,6 +9,7 @@ class LoadCsvToDatabase
       notify_load_progress 'Updating municipalities table...'
       update_existing_municipalities
       insert_missing_municipalities
+      delete_records_no_longer_present_on_input_data
       notify_load_progress 'Done!'
     end
 
@@ -35,9 +36,14 @@ class LoadCsvToDatabase
         ), "updates" AS (
           SELECT "m"."id", "i".*
           FROM "input_data" AS "i" LEFT JOIN "municipalities" AS "m" ON
-            "i"."name" = "m"."name"
-            AND "i"."municipality_key" = "m"."municipality_key"
+            "i"."municipality_key" = "m"."municipality_key"
             AND "i"."state_id" = "m"."state_id"
+        ), "deletes" AS (
+          SELECT "m"."id"
+          FROM "municipalities" AS "m" LEFT JOIN "input_data" AS "i" ON
+            "m"."municipality_key" = "i"."municipality_key"
+            AND "m"."state_id" = "i"."state_id"
+          WHERE "i"."municipality_key" IS NULL AND "i"."state_id" IS NULL
         )
       SQL
     end
@@ -45,11 +51,8 @@ class LoadCsvToDatabase
     def update_existing_municipalities
       database_execute <<~SQL.squish
         #{municipality_import_cte}
-        UPDATE "municipalities" SET
-          "name" = "updates"."name",
-          "municipality_key" = "updates"."municipality_key",
-          "zip_code" = "updates"."zip_code",
-          "state_id" = "updates"."state_id"
+        UPDATE "municipalities"
+        SET "name" = "updates"."name", "zip_code" = "updates"."zip_code"
         FROM "updates" WHERE "municipalities"."id" = "updates"."id"
       SQL
     end
@@ -62,6 +65,13 @@ class LoadCsvToDatabase
         FROM "updates"
         WHERE "id" IS NULL
         ORDER BY "state_id", "municipality_key" ASC
+      SQL
+    end
+
+    def delete_records_no_longer_present_on_input_data
+      database_execute <<~SQL.squish
+        #{municipality_import_cte}
+        DELETE FROM "municipalities" WHERE "id" IN (SELECT "id" FROM "deletes")
       SQL
     end
   end
