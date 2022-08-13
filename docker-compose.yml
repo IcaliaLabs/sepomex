@@ -11,6 +11,11 @@ services:
       - type: volume
         source: postgres_data
         target: /var/lib/postgresql/data
+
+      - ./db/dumps:/db/dumps
+      - ./bin/dumpdb:/usr/local/bin/dumpdb:ro
+      - ./bin/restoredb:/usr/local/bin/restoredb:ro
+
     ports:
       - published: ${SEPOMEX_PG_PORT:-5432}
         target: 5432
