@@ -145,38 +145,21 @@ RUN bundle config unset --local without
 # Install the full gem list:
 RUN bundle install
 
-# Stage 5: Asset Precompilation ================================================
-# We'll copy the minimal set of files required by rails to precompile the app
-# assets:
-FROM testing AS asset-precompilation
-
-# Receive the developer username argument again, as ARGS won't persist between
-# stages on non-buildkit builds:
-ARG DEVELOPER_USERNAME=you
-
-# Copy all the files required for the asset compilation:
-COPY --chown=${DEVELOPER_USERNAME} vendor /workspaces/sepomex/vendor
-COPY --chown=${DEVELOPER_USERNAME} app/assets /workspaces/sepomex/app/assets
-COPY --chown=${DEVELOPER_USERNAME} app/javascript /workspaces/sepomex/app/javascript
-COPY --chown=${DEVELOPER_USERNAME} bin/rails /workspaces/sepomex/bin/
-COPY --chown=${DEVELOPER_USERNAME} Rakefile /workspaces/sepomex/
-COPY --chown=${DEVELOPER_USERNAME} config/initializers/assets.rb /workspaces/sepomex/config/initializers/assets.rb
-COPY --chown=${DEVELOPER_USERNAME} config/environments/production.rb /workspaces/sepomex/config/environments/production.rb
-COPY --chown=${DEVELOPER_USERNAME} config/application.rb config/boot.rb config/environment.rb /workspaces/sepomex/config/
-
-# Compile the assets:
-RUN RAILS_ENV=production SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails assets:precompile
-
-# Stage 6: Builder =============================================================
+# Stage 5: Builder =============================================================
 # In this stage we'll add the rest of the code, compile assets, and perform a
 # cleanup for the releasable image.
-
-# Use the "testing" stage as base:
 FROM testing AS builder
 
 # Receive the developer username argument again, as ARGS won't persist between
 # stages on non-buildkit builds:
 ARG DEVELOPER_USERNAME=you
+
+# Receive the developer username argument again, as ARGS won't persist between
+# stages on non-buildkit builds:
+ARG DEVELOPER_USERNAME=you
+
+# Copy the full contents of the project:
+COPY --chown=${DEVELOPER_USERNAME} . /workspaces/sepomex/
 
 # Configure bundler to exclude the gems from the "development" and "test" groups
 # from the installed gemset, which should set them out to remove on cleanup:
@@ -185,12 +168,6 @@ RUN bundle config set --local without development test
 # Cleanup the gems excluded from the current configuration. We'll copy the
 # remaining gemset into the deployable image on the next stage:
 RUN bundle clean --force
-
-# Copy the full contents of the project:
-COPY --chown=${DEVELOPER_USERNAME} . /workspaces/sepomex/
-
-# Copy the precompiled assets:
-COPY --from=asset-precompilation --chown=${DEVELOPER_USERNAME} /workspaces/sepomex /workspaces/sepomex
 
 # Change to root, before performing the final cleanup:
 USER root
@@ -218,21 +195,20 @@ RUN rm -rf \
     .vscode \
     Guardfile \
     bin/rspec \
+    bin/checkdb \
     bin/dumpdb \
     bin/restoredb \
     bin/setup \
     bin/dev-entrypoint \
-    ci-compose.yml \
     db/dumps \
     db/seeds/development.rb \
     doc \
     docker-compose.yml \
     Dockerfile \
     log/production.log \
-    spec \
-    staging-compose.yml
+    spec
 
-# Stage 7: Release =============================================================
+# Stage 6: Release =============================================================
 # In this stage, we build the final, releasable, deployable Docker image, which
 # should be smaller than the images generated on previous stages:
 
@@ -262,6 +238,9 @@ RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 
 # Set the installed app directory as the working directory:
 WORKDIR /workspaces/sepomex
+
+# Set the entrypoint script:
+ENTRYPOINT [ "/workspaces/sepomex/bin/entrypoint" ]
 
 # Set the default command:
 CMD [ "puma" ]
