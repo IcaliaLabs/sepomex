@@ -71,12 +71,12 @@ jobs:
           echo "--- ${{ steps.build-test-image.outputs.digest }} ---"
           echo ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
 
-      # - name: Run tests
-      #   env:
-      #     UID: ${{ steps.variables.outputs.runner-uid }}
-      #     USER: ${{ steps.variables.outputs.runner-user }}
-      #     TESTING_IMAGE_TAG: ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
-      #   run: docker compose run --rm tests
+      - name: Run tests
+        env:
+          UID: ${{ steps.variables.outputs.runner-uid }}
+          USER: ${{ steps.variables.outputs.runner-user }}
+          TESTING_IMAGE_TAG: "@${{ steps.build-test-image.outputs.digest }}"
+        run: docker compose run --rm tests
 
       # - name: Archive system spec screenshots
       #   uses: actions/upload-artifact@v3.1.0
