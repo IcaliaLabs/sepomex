@@ -11,6 +11,7 @@ class LoadCsvToDatabase
       notify_load_progress 'Updating zip codes table...'
       update_existing_records
       add_missing_records
+      delete_records_no_longer_present_on_input_data
       notify_load_progress 'Done!'
     end
 
@@ -40,6 +41,13 @@ class LoadCsvToDatabase
             "i"."c_estado" = "z"."c_estado"
             AND "i"."c_mnpio" = "z"."c_mnpio"
             AND "i"."id_asenta_cpcons" = "z"."id_asenta_cpcons"
+        ), "deletes" AS (
+          SELECT DISTINCT "z"."id"
+          FROM "zip_codes" AS "z" LEFT JOIN "input_data" AS "i" ON
+            "z"."c_estado" = "i"."c_estado"
+            AND "z"."c_mnpio" = "i"."c_mnpio"
+            AND "z"."id_asenta_cpcons" = "i"."id_asenta_cpcons"
+          WHERE "i"."d_codigo" IS NULL
         )
       SQL
     end
@@ -80,6 +88,13 @@ class LoadCsvToDatabase
           "c_cve_ciudad"     = "updates"."c_cve_ciudad",
           "updated_at"       = "updates"."updated_at"
         FROM "updates" WHERE "zip_codes"."id" = "updates"."id"
+      SQL
+    end
+
+    def delete_records_no_longer_present_on_input_data
+      database_execute <<~SQL.squish
+        #{zip_codes_import_cte}
+        DELETE FROM "zip_codes" WHERE "id" IN (SELECT "id" FROM "deletes")
       SQL
     end
   end
