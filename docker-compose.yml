@@ -71,6 +71,7 @@ services:
 
   # The tests container:
   tests:
+    image: icalialabs/portal${TESTING_IMAGE_TAG:-:testing}
     <<: *app
     build:
       <<: *app_build
