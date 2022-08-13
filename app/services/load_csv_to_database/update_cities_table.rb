@@ -7,6 +7,7 @@ class LoadCsvToDatabase
   class UpdateCitiesTable < BaseUpdateTable
     def perform!
       notify_load_progress 'Creating cities...'
+
       update_existing_cities
       insert_missing_cities
 
@@ -21,32 +22,16 @@ class LoadCsvToDatabase
     def city_import_cte
       <<~SQL.squish
         WITH "input_source" AS (
-          (
-            SELECT DISTINCT ON ("c_estado"::int, "c_cve_ciudad"::int)
-              "d_ciudad" AS "name",
-              "c_estado"::int AS "inegi_state_code",
-              "c_cve_ciudad"::int AS "sepomex_city_code"
-            FROM "zip_codes"
-            WHERE "c_estado" <> '09' AND "c_cve_ciudad" IS NOT NULL
-            ORDER BY "c_estado"::int, "c_cve_ciudad"::int
-          ) UNION ALL (
-            SELECT DISTINCT ON ("c_estado"::int)
-              "d_ciudad" AS "name",
-              "c_estado"::int AS "inegi_state_code",
-              "c_cve_ciudad"::int AS "sepomex_city_code"
-            FROM "zip_codes"
-            WHERE "c_estado" = '09' AND "c_cve_ciudad" IS NOT NULL
-            ORDER BY "c_estado"::int, "c_cve_ciudad"::int
-          )
+          #{ZipCode.cities_data.to_sql}
         ), "normalized_rows" AS (
           SELECT
-            "i"."name",
+            "i"."d_ciudad" AS "name",
             "s"."id" AS "state_id",
-            "i"."sepomex_city_code"
+            "i"."c_cve_ciudad"::int AS "sepomex_city_code"
           FROM
             "input_source" AS "i"
             INNER JOIN "states" AS "s" ON
-              "i"."inegi_state_code" = "s"."inegi_state_code"
+              "i"."c_estado"::int = "s"."inegi_state_code"
         ), "updates" AS (
           SELECT "c"."id", "i".*
           FROM
