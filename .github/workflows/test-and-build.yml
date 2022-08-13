@@ -65,36 +65,42 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Run tests
-        env:
-          UID: ${{ steps.variables.outputs.runner-uid }}
-          USER: ${{ steps.variables.outputs.runner-user }}
-          TESTING_IMAGE_TAG: ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
-        run: docker compose run --rm tests
+      - name: Check test image
+        run: |-
+          docker image ls
+          echo "--- ${{ steps.build-test-image.outputs.digest }} ---"
+          echo ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
 
-      - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v3.1.0
-        if: always()
-        with:
-          name: system-spec-screenshots
-          retention-days: 7
-          path: |
-            tmp/capybara/screenshots
+      # - name: Run tests
+      #   env:
+      #     UID: ${{ steps.variables.outputs.runner-uid }}
+      #     USER: ${{ steps.variables.outputs.runner-user }}
+      #     TESTING_IMAGE_TAG: ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
+      #   run: docker compose run --rm tests
 
-      - name: Build & Push Release Image
-        id: build-and-push-release-image
-        uses: docker/build-push-action@v3.1.1
-        with:
-          push: false
-          target: release
-          platforms: linux/amd64
-          builder: ${{ steps.buildx.outputs.name }}
-          build-args: |
-            DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
-            DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
-          tags: |
-            us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:${{ steps.variables.outputs.git-commit-short-sha }}
-            us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:${{ steps.variables.outputs.git-dasherized-branch }}
-            us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Archive system spec screenshots
+      #   uses: actions/upload-artifact@v3.1.0
+      #   if: always()
+      #   with:
+      #     name: system-spec-screenshots
+      #     retention-days: 7
+      #     path: |
+      #       tmp/capybara/screenshots
+
+      # - name: Build & Push Release Image
+      #   id: build-and-push-release-image
+      #   uses: docker/build-push-action@v3.1.1
+      #   with:
+      #     push: false
+      #     target: release
+      #     platforms: linux/amd64
+      #     builder: ${{ steps.buildx.outputs.name }}
+      #     build-args: |
+      #       DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
+      #       DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
+      #     tags: |
+      #       us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:${{ steps.variables.outputs.git-commit-short-sha }}
+      #       us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:${{ steps.variables.outputs.git-dasherized-branch }}
+      #       us-central1-docker.pkg.dev/icalia-labs-sepomex/sepomex/sepomex-web:latest
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
