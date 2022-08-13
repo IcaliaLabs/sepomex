@@ -1,0 +1,25 @@
+#! /bin/bash
+
+# For use on the postgres container only.
+set -e
+
+: ${DB_NAME:=$1}
+: ${DB_DUMP_DIR:=$2}
+: ${PGUSER:=postgres}
+
+# echo "==============================="
+# echo "PGUSER: ${PGUSER}"
+# echo "PGHOST: ${PGHOST}"
+# echo "PGPORT: ${PGPORT}"
+# echo "PGPASSWORD: *hidden*"
+# echo "==============================="
+: ${DB_DUMP_PATH:="${DB_DUMP_DIR}/${DB_NAME}-`date -u +%Y-%m-%d-%H%M%S+0000`.dump"}
+
+# echo "================================="
+# echo "DB_NAME: ${DB_NAME}"
+# echo "DB_DUMP_PATH: ${DB_DUMP_PATH}"
+# echo "================================="
+
+pg_dump -U $PGUSER --compress=9 --no-privileges --no-owner --format=custom \
+ --file=$DB_DUMP_PATH $DB_NAME \
+ && echo "Database ${DB_NAME} dumped into ${DB_DUMP_PATH}"
