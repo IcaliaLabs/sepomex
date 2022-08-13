@@ -1,0 +1,12 @@
+name: CI & CD
+
+on:
+  # Trigger the workflow on pushes to the main branch, including PR merges:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    name: Integration
+    uses: ./.github/workflows/test-and-build.yml
