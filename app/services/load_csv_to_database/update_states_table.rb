@@ -8,7 +8,7 @@ class LoadCsvToDatabase
     def perform!
       notify_load_progress 'Updating states table...'
       update_existing_states
-      insert_missing_states
+      insert_missing_states # highly unlikely!
       notify_load_progress 'Done!'
     end
 
@@ -17,18 +17,16 @@ class LoadCsvToDatabase
     def state_import_cte
       <<~SQL.squish
         WITH "input_data" AS (
-          SELECT "c_estado"::integer AS "id", "d_estado" AS "name"
+          SELECT DISTINCT ON ("c_estado"::integer)
+            "d_estado" AS "name", "c_estado"::integer AS "inegi_state_code"
           FROM "zip_codes"
-          GROUP BY "d_estado", "c_estado"
           ORDER BY "c_estado"::integer
         ), "updates" AS (
-          SELECT
-            "states"."id",
-            "input_data"."name",
-            "input_data"."id" as "id_on_import_data"
+          SELECT "s"."id", "i".*
           FROM
-            "input_data"
-            LEFT JOIN "states" ON "input_data"."id" = "states"."id"
+            "input_data" AS "i"
+            LEFT JOIN "states" AS "s" ON
+              "i"."inegi_state_code" = "s"."inegi_state_code"
         )
       SQL
     end
@@ -36,8 +34,8 @@ class LoadCsvToDatabase
     def insert_missing_states
       database_execute <<~SQL.squish
         #{state_import_cte}
-        INSERT INTO "states" ("id", "name", "cities_count")
-        SELECT "id_on_import_data", "name", 0
+        INSERT INTO "states" ("name", "cities_count", "inegi_state_code")
+        SELECT "name", 0, "inegi_state_code"
         FROM "updates" WHERE "id" IS NULL
       SQL
     end
@@ -45,7 +43,9 @@ class LoadCsvToDatabase
     def update_existing_states
       database_execute <<~SQL.squish
         #{state_import_cte}
-        UPDATE "states" SET "name" = "updates"."name"
+        UPDATE "states"
+        SET
+          "name" = "updates"."name"
         FROM "updates" WHERE "states"."id" = "updates"."id"
       SQL
     end
