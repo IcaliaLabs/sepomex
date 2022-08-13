@@ -61,7 +61,7 @@ jobs:
             DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
             DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
           tags: |
-            icalialabs/portal:testing-${{ steps.variables.outputs.git-dasherized-branch }}
+            icalialabs/sepomex-web:testing-${{ steps.variables.outputs.git-dasherized-branch }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

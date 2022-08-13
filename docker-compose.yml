@@ -20,7 +20,7 @@ services:
 
   # The default development container:
   development: &app
-    image: icalialabs/sepomex:development
+    image: icalialabs/sepomex-web:development
     build: &app_build
       context: .
       dockerfile: Dockerfile
@@ -71,7 +71,7 @@ services:
 
   # The tests container:
   tests:
-    image: icalialabs/portal${TESTING_IMAGE_TAG:-:testing}
+    image: icalialabs/sepomex-web${TESTING_IMAGE_TAG:-:testing}
     <<: *app
     build:
       <<: *app_build
