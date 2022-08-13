@@ -32,15 +32,14 @@ class LoadCsvToDatabase
           )
         ), "updates" AS (
           SELECT
-            "zip_codes"."id",
-            "input_data".*,
-            COALESCE("zip_codes"."created_at", NOW()) AS "created_at",
+            "z"."id",
+            "i".*,
+            COALESCE("z"."created_at", NOW()) AS "created_at",
             NOW() AS "updated_at"
-          FROM
-            "input_data"
-            LEFT JOIN "zip_codes" ON
-              "input_data"."d_codigo" = "zip_codes"."d_codigo"
-              AND "input_data"."id_asenta_cpcons" = "zip_codes"."id_asenta_cpcons"
+          FROM "input_data" AS "i" LEFT JOIN "zip_codes" AS "z" ON
+            "i"."c_estado" = "z"."c_estado"
+            AND "i"."c_mnpio" = "z"."c_mnpio"
+            AND "i"."id_asenta_cpcons" = "z"."id_asenta_cpcons"
         )
       SQL
     end
