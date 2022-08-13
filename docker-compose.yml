@@ -71,8 +71,9 @@ services:
 
   # The tests container:
   tests:
-    image: icalialabs/sepomex-web${TESTING_IMAGE_TAG:-:testing}
     <<: *app
+
+    image: icalialabs/sepomex-web${TESTING_IMAGE_TAG:-:testing}
     build:
       <<: *app_build
       target: testing
