@@ -21,8 +21,14 @@ class LoadCsvToDatabase
 
     def city_import_cte
       <<~SQL.squish
-        WITH "input_source" AS (
-          #{ZipCode.cities_data.to_sql}
+        WITH "cities_data_except_cmdx" AS (
+          #{ZipCode.cities_data_except_cmdx.to_sql}
+        ), "cmdx_cities_data" AS (
+          #{ZipCode.cmdx_cities_data.to_sql}
+        ), "input_source" AS (
+          SELECT * FROM "cmdx_cities_data"
+          UNION ALL
+          SELECT * FROM "cities_data_except_cmdx"
         ), "normalized_rows" AS (
           SELECT
             "i"."d_ciudad" AS "name",
