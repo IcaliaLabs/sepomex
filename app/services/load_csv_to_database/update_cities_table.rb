@@ -21,17 +21,23 @@ class LoadCsvToDatabase
 
     def city_import_cte
       <<~SQL.squish
-        WITH "input_source" AS (
-          #{ZipCode.cities_data.to_sql}
+        WITH "cities_data_except_cmdx" AS (
+          #{ZipCode.cities_data_except_cmdx.to_sql}
+        ), "cmdx_cities_data" AS (
+          #{ZipCode.cmdx_cities_data.to_sql}
+        ), "input_source" AS (
+          SELECT * FROM "cmdx_cities_data"
+          UNION ALL
+          SELECT * FROM "cities_data_except_cmdx"
         ), "normalized_rows" AS (
           SELECT
             "i"."d_ciudad" AS "name",
             "s"."id" AS "state_id",
-            "i"."c_cve_ciudad"::int AS "sepomex_city_code"
+            CAST("i"."c_cve_ciudad" AS INTEGER) AS "sepomex_city_code"
           FROM
             "input_source" AS "i"
             INNER JOIN "states" AS "s" ON
-              "i"."c_estado"::int = "s"."inegi_state_code"
+              CAST("i"."c_estado" AS INTEGER) = "s"."inegi_state_code"
         ), "updates" AS (
           SELECT "c"."id", "i".*
           FROM
@@ -42,10 +48,10 @@ class LoadCsvToDatabase
         ), "deletes" AS (
           SELECT "c"."id"
           FROM
-            "normalized_rows" AS "i"
-            RIGHT JOIN "cities" AS "c" ON
-              "i"."state_id" = "c"."state_id"
-              AND "i"."sepomex_city_code" = "c"."sepomex_city_code"
+            "cities" AS "c"
+            LEFT JOIN "normalized_rows" AS "i" ON
+              "c"."state_id" = "i"."state_id"
+              AND "c"."sepomex_city_code" = "i"."sepomex_city_code"
           WHERE "i"."sepomex_city_code" IS NULL
         )
       SQL

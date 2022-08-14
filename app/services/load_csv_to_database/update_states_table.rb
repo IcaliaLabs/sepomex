@@ -16,8 +16,14 @@ class LoadCsvToDatabase
 
     def state_import_cte
       <<~SQL.squish
-        WITH "input_source" AS (
-          #{ZipCode.cities_data.to_sql}
+        WITH "cities_data_except_cmdx" AS (
+          #{ZipCode.cities_data_except_cmdx.to_sql}
+        ), "cmdx_cities_data" AS (
+          #{ZipCode.cmdx_cities_data.to_sql}
+        ), "input_source" AS (
+          SELECT * FROM "cmdx_cities_data"
+          UNION ALL
+          SELECT * FROM "cities_data_except_cmdx"
         ), "city_counts" AS (
           SELECT "c_estado", COUNT(*) AS "cities_count"
           FROM "input_source" GROUP BY "c_estado"
@@ -25,7 +31,7 @@ class LoadCsvToDatabase
           SELECT DISTINCT
             "i"."d_estado" AS "name",
             "c"."cities_count",
-            "i"."c_estado"::INT AS "inegi_state_code"
+            CAST("i"."c_estado" AS INT) AS "inegi_state_code"
           FROM
             "input_source" AS "i"
             INNER JOIN "city_counts" AS "c" ON
