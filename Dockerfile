@@ -13,7 +13,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
-    libpq5 \
+    libsqlite3-0 \
     openssl \
     # Required by mimemagic gem:
     shared-mime-info \
@@ -33,7 +33,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     build-essential \
     git \
-    libpq-dev
+    libsqlite3-dev
 
 # Receive the developer user's UID and USER:
 ARG DEVELOPER_UID=1000
