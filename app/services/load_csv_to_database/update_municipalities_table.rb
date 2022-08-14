@@ -18,12 +18,14 @@ class LoadCsvToDatabase
     def municipality_import_cte
       <<~SQL.squish
         WITH "input_data_source" AS (
-          SELECT DISTINCT ON ("c_estado", "c_mnpio")
-            "d_mnpio" AS "name",
+          SELECT
+            MIN("d_mnpio") AS "name",
             "c_mnpio" AS "municipality_key",
-            "d_cp" AS "zip_code",
-            "d_estado" AS "state_name"
-          FROM "zip_codes" ORDER BY "c_estado", "c_mnpio" ASC, "d_cp" DESC
+            MAX("d_cp") AS "zip_code",
+            MIN("d_estado") AS "state_name"
+          FROM "zip_codes"
+          GROUP BY "c_estado", "c_mnpio"
+          ORDER BY "c_estado" ASC, "c_mnpio" ASC
         ), "input_data" AS (
           SELECT
             "input_data_source"."name",
