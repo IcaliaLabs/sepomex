@@ -22,6 +22,7 @@ class LoadCsvToDatabase
     end
 
     def zip_codes_import_cte
+      current_time_cast = "CAST('#{Time.current.utc.to_s(:db)}' AS TIMESTAMP)"
       <<~SQL.squish
         WITH "input_data" AS (
           SELECT * FROM (
@@ -35,8 +36,8 @@ class LoadCsvToDatabase
           SELECT
             "z"."id",
             "i".*,
-            COALESCE("z"."created_at", NOW()) AS "created_at",
-            NOW() AS "updated_at"
+            COALESCE("z"."created_at", #{current_time_cast}) AS "created_at",
+            #{current_time_cast} AS "updated_at"
           FROM "input_data" AS "i" LEFT JOIN "zip_codes" AS "z" ON
             "i"."c_estado" = "z"."c_estado"
             AND "i"."c_mnpio" = "z"."c_mnpio"
