@@ -50,7 +50,7 @@ In order to provide more flexibility to search a zip code, whether is by city, c
 #### all
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes 
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes
 ```
 
 ##### Response
@@ -76,7 +76,7 @@ curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes
       "d_zona": "Urbano",
       "c_cve_ciudad": "01"
     },
-    ... 
+    ...
   ],
   "meta": {
     "pagination": {
@@ -137,7 +137,7 @@ curl -X GET https://sepomex.icalialabs.com/api/v1/states
 
 ```json
 {
-  
+
   "states": [
     {
       "id": 1,
@@ -384,8 +384,9 @@ $ rails db:migrate
 
 ```bash
 $ rails db:seed
+$ rake data:load
 ```
-This operation will take some time, due to the number of records.
+This operation will take some time, due to the number of records. Rake data load will load the data from the csv files into the database, like seed does.
 
 6. Close the container
 
@@ -408,7 +409,7 @@ web_1        | The Gemfile's dependencies are satisfied
 web_1        | 2020/08/04 17:40:21 Waiting for: tcp://postgres:5432
 web_1        | 2020/08/04 17:40:21 Connected to tcp://postgres:5432
 web_1        | => Booting Puma
-web_1        | => Rails 6.0.3.2 application starting in development 
+web_1        | => Rails 6.0.3.2 application starting in development
 web_1        | => Run `rails server --help` for more startup options
 web_1        | Puma starting in single mode...
 web_1        | * Version 3.12.6 (ruby 2.7.1-p83), codename: Llamas in Pajamas

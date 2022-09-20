@@ -6,7 +6,7 @@ class ZipCode < ApplicationRecord
   default_scope { order(:id) }
 
   scope :find_by_zip_code, lambda { |cp|
-    where('d_codigo ILIKE ?', "%#{cp}%")
+    where('lower(d_codigo) LIKE lower(?)', "%#{cp}%")
   }
 
   scope :find_by_state, lambda { |state|
@@ -14,8 +14,8 @@ class ZipCode < ApplicationRecord
   }
 
   scope :find_by_city, lambda { |city|
-    where("unaccent(d_ciudad) ILIKE unaccent(?)
-          OR unaccent(d_mnpio) ILIKE unaccent(?)", "%#{city}%", "%#{city}%")
+    where("lower(unaccent(d_ciudad)) LIKE lower(unaccent(?))
+          OR lower(unaccent(d_mnpio)) LIKE lower(unaccent(?))", "%#{city}%", "%#{city}%")
   }
 
   scope :find_by_colony, lambda { |colony|
@@ -83,6 +83,6 @@ class ZipCode < ApplicationRecord
   private
 
   def self.unaccent(column_name, value)
-    where("unaccent(#{column_name}) ILIKE unaccent(?)", "%#{value}%")
+    where("lower(unaccent(#{column_name})) LIKE lower(unaccent(?))", "%#{value}%")
   end
 end

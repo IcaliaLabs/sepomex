@@ -12,10 +12,6 @@
 
 ActiveRecord::Schema.define(version: 2022_08_13_184618) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-  enable_extension "unaccent"
-
   create_table "cities", force: :cascade do |t|
     t.string "name", null: false
     t.integer "state_id", null: false
