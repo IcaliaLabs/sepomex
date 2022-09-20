@@ -1,0 +1,2 @@
+class FtsZipCode < ApplicationRecord
+end

@@ -29,15 +29,11 @@ class ZipCode < ApplicationRecord
       zip_codes = zip_codes.find_by_zip_code(params['cp'] || params['zip_code'])
     end
 
-    if params[:state].present?
-      zip_codes = zip_codes.find_by_state(params['state'])
-    end
+    zip_codes = zip_codes.find_by_state(params['state']) if params[:state].present?
 
     zip_codes = zip_codes.find_by_city(params['city']) if params['city'].present?
 
-    if params[:colony].present?
-      zip_codes = zip_codes.find_by_colony(params['colony'])
-    end
+    zip_codes = zip_codes.find_by_colony(params['colony']) if params[:colony].present?
 
     zip_codes
   end
@@ -80,9 +76,24 @@ class ZipCode < ApplicationRecord
     )
   end
 
+  after_commit :build_index
+
+  scope :build_indexes, -> { all.each(&:save) }
+
   private
 
   def self.unaccent(column_name, value)
     where("lower(unaccent(#{column_name})) LIKE lower(unaccent(?))", "%#{value}%")
+  end
+
+  def build_index
+    # data = self.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta').values.map do |value|
+    #   (value.is_a? Integer) ? value : value.downcase.parameterize(separator: " ")
+    # end
+    # data.join(',')
+    data = self.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta')
+                     .transform_values { |v| v.to_s.downcase.parameterize(separator: ' ') }
+    data['zip_code_id'] = data.delete('id').to_i
+    FtsZipCode.find_or_create_by(data)
   end
 end

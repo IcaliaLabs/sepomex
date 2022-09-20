@@ -10,13 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_13_184618) do
+ActiveRecord::Schema.define(version: 2022_09_20_190651) do
 
   create_table "cities", force: :cascade do |t|
     t.string "name", null: false
     t.integer "state_id", null: false
     t.integer "sepomex_city_code", limit: 2, null: false
     t.index ["state_id", "sepomex_city_code"], name: "index_cities_on_state_id_and_sepomex_city_code", unique: true
+  end
+
+# Could not dump table "fts_zip_codes" because of following StandardError
+#   Unknown type '' for column 'zip_code_id'
+
+# Could not dump table "fts_zip_codes_content" because of following StandardError
+#   Unknown type '' for column 'c0zip_code_id'
+
+  create_table "fts_zip_codes_docsize", primary_key: "docid", force: :cascade do |t|
+    t.binary "size"
+  end
+
+  create_table "fts_zip_codes_segdir", primary_key: ["level", "idx"], force: :cascade do |t|
+    t.integer "level"
+    t.integer "idx"
+    t.integer "start_block"
+    t.integer "leaves_end_block"
+    t.integer "end_block"
+    t.binary "root"
+  end
+
+  create_table "fts_zip_codes_segments", primary_key: "blockid", force: :cascade do |t|
+    t.binary "block"
+  end
+
+  create_table "fts_zip_codes_stat", force: :cascade do |t|
+    t.binary "value"
   end
 
   create_table "municipalities", force: :cascade do |t|
