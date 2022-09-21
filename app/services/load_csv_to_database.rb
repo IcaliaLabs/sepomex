@@ -17,6 +17,7 @@ class LoadCsvToDatabase
   def perform!
     read_csv_data
     UpdateZipCodesTable.perform! self
+    ZipCode.build_indexes # Create ZipCode indexes
     UpdateStatesTable.perform! self
     UpdateMunicipalitiesTable.perform! self
     UpdateCitiesTable.perform! self

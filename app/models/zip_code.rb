@@ -12,7 +12,7 @@ class ZipCode < ApplicationRecord
 
   scope :find_by_state, lambda { |state|
     # unaccent('d_estado', state)
-    self.distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{state.downcase.parameterize(separator: ' ')}%")
+    self.distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{alpharize(state)}%")
   }
 
   scope :find_by_city, lambda { |city|
@@ -92,6 +92,9 @@ class ZipCode < ApplicationRecord
   end
 
   private
+  def self.alpharize(text)
+    text.downcase.parameterize(separator: ' ')
+  end
 
   def self.unaccent(column_name, value)
     where("lower(unaccent(#{column_name})) LIKE lower(unaccent(?))", "%#{value}%")
