@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ZipCode < ApplicationRecord
+  has_one :fts_zip_code, dependent: :destroy
   validates :d_codigo, presence: true
 
   default_scope { order(:id) }
@@ -10,7 +11,8 @@ class ZipCode < ApplicationRecord
   }
 
   scope :find_by_state, lambda { |state|
-    unaccent('d_estado', state)
+    # unaccent('d_estado', state)
+    self.distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{state.downcase.parameterize(separator: ' ')}%")
   }
 
   scope :find_by_city, lambda { |city|
@@ -78,7 +80,16 @@ class ZipCode < ApplicationRecord
 
   after_commit :build_index
 
-  scope :build_indexes, -> { all.each(&:save) }
+  # scope :build_indexes, -> { all.each(&:save) }
+
+  def self.build_indexes
+    values = all.map { |item| build_index(item) }
+    sql = <<~SQL.strip
+      INSERT INTO fts_zip_codes (zip_code_id, d_ciudad, d_estado, d_asenta)
+      VALUES #{values.join(',')}
+    SQL
+    connection.execute sql
+  end
 
   private
 
@@ -86,14 +97,14 @@ class ZipCode < ApplicationRecord
     where("lower(unaccent(#{column_name})) LIKE lower(unaccent(?))", "%#{value}%")
   end
 
-  def build_index
+  def self.build_index(item)
     # data = self.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta').values.map do |value|
     #   (value.is_a? Integer) ? value : value.downcase.parameterize(separator: " ")
     # end
     # data.join(',')
-    data = self.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta')
-                     .transform_values { |v| v.to_s.downcase.parameterize(separator: ' ') }
-    data['zip_code_id'] = data.delete('id').to_i
-    FtsZipCode.find_or_create_by(data)
+    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta').transform_values {
+      |v| ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v
+    }.values.join(",")})"
+    # data['zip_code_id'] = data.delete('id')
   end
 end
