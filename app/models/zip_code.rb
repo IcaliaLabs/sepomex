@@ -11,17 +11,16 @@ class ZipCode < ApplicationRecord
   }
 
   scope :find_by_state, lambda { |state|
-    # unaccent('d_estado', state)
-    self.distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{alpharize(state)}%")
+    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{alpharize(state)}%")
   }
 
   scope :find_by_city, lambda { |city|
-    where("lower(unaccent(d_ciudad)) LIKE lower(unaccent(?))
-          OR lower(unaccent(d_mnpio)) LIKE lower(unaccent(?))", "%#{city}%", "%#{city}%")
+    city = "%#{alpharize(city)}%"
+    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_ciudad LIKE ? OR fts_zip_codes.d_mnpio LIKE ?', city, city)
   }
 
   scope :find_by_colony, lambda { |colony|
-    unaccent('d_asenta', colony)
+    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_asenta LIKE ?', "%#{alpharize(colony)}%")
   }
 
   def self.search(params = {})
@@ -85,7 +84,7 @@ class ZipCode < ApplicationRecord
   def self.build_indexes
     values = all.map { |item| build_index(item) }
     sql = <<~SQL.strip
-      INSERT INTO fts_zip_codes (zip_code_id, d_ciudad, d_estado, d_asenta)
+      INSERT INTO fts_zip_codes (zip_code_id, d_ciudad, d_estado, d_asenta, d_mnpio)
       VALUES #{values.join(',')}
     SQL
     connection.execute sql
@@ -105,7 +104,7 @@ class ZipCode < ApplicationRecord
     #   (value.is_a? Integer) ? value : value.downcase.parameterize(separator: " ")
     # end
     # data.join(',')
-    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta').transform_values {
+    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta', 'd_mnpio').transform_values {
       |v| ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v
     }.values.join(",")})"
     # data['zip_code_id'] = data.delete('id')
