@@ -77,8 +77,6 @@ class ZipCode < ApplicationRecord
     )
   end
 
-  after_commit :build_index
-
   # scope :build_indexes, -> { all.each(&:save) }
 
   def self.build_indexes
@@ -91,6 +89,7 @@ class ZipCode < ApplicationRecord
   end
 
   private
+
   def self.alpharize(text)
     text.downcase.parameterize(separator: ' ')
   end

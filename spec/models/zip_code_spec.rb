@@ -32,6 +32,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a wrong state gives empty results' do
       create_states(%w[Tamaulipas Sinaloa Tijuana])
+      ZipCode.build_indexes
       state = 'Nuevo Leon'
 
       expect(ZipCode.find_by_state(state)).to be_empty
