@@ -19,31 +19,12 @@ ActiveRecord::Schema.define(version: 2022_09_20_190651) do
     t.index ["state_id", "sepomex_city_code"], name: "index_cities_on_state_id_and_sepomex_city_code", unique: true
   end
 
-# Could not dump table "fts_zip_codes" because of following StandardError
-#   Unknown type '' for column 'zip_code_id'
-
-# Could not dump table "fts_zip_codes_content" because of following StandardError
-#   Unknown type '' for column 'c0zip_code_id'
-
-  create_table "fts_zip_codes_docsize", primary_key: "docid", force: :cascade do |t|
-    t.binary "size"
-  end
-
-  create_table "fts_zip_codes_segdir", primary_key: ["level", "idx"], force: :cascade do |t|
-    t.integer "level"
-    t.integer "idx"
-    t.integer "start_block"
-    t.integer "leaves_end_block"
-    t.integer "end_block"
-    t.binary "root"
-  end
-
-  create_table "fts_zip_codes_segments", primary_key: "blockid", force: :cascade do |t|
-    t.binary "block"
-  end
-
-  create_table "fts_zip_codes_stat", force: :cascade do |t|
-    t.binary "value"
+  create_table "fts_zip_codes", force: :cascade do |t|
+    t.integer "zip_code_id", null: false
+    t.string "d_ciudad"
+    t.string "d_estado"
+    t.string "d_asenta"
+    t.string "d_mnpio"
   end
 
   create_table "municipalities", force: :cascade do |t|

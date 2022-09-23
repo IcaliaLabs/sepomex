@@ -1,6 +1,12 @@
 class CreateFtsZipCodesTable < ActiveRecord::Migration[6.0]
   def up
-    execute('CREATE VIRTUAL TABLE fts_zip_codes USING fts4(zip_code_id, d_ciudad, d_estado, d_asenta, d_mnpio)')
+    create_table :fts_zip_codes do |t|
+      t.integer :zip_code_id,null: false # Código Postal asentamiento
+      t.string :d_ciudad
+      t.string :d_estado
+      t.string :d_asenta
+      t.string :d_mnpio
+    end
   end
 
   def down
