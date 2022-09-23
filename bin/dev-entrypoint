@@ -11,7 +11,6 @@ if command_requires_setup?
     ensure_project_gems_are_installed
 
     if command_might_require_database?
-      wait_for_service_to_accept_connections 'tcp://postgres:5432'
       setup_activerecord_database unless activerecord_database_ready?
     end
 

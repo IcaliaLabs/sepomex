@@ -1,25 +1,26 @@
 # frozen_string_literal: true
 
 class ZipCode < ApplicationRecord
+  has_one :fts_zip_code, dependent: :destroy
   validates :d_codigo, presence: true
 
   default_scope { order(:id) }
 
   scope :find_by_zip_code, lambda { |cp|
-    where('d_codigo ILIKE ?', "%#{cp}%")
+    where('lower(d_codigo) LIKE lower(?)', "%#{cp}%")
   }
 
   scope :find_by_state, lambda { |state|
-    unaccent('d_estado', state)
+    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{alpharize(state)}%")
   }
 
   scope :find_by_city, lambda { |city|
-    where("unaccent(d_ciudad) ILIKE unaccent(?)
-          OR unaccent(d_mnpio) ILIKE unaccent(?)", "%#{city}%", "%#{city}%")
+    city = "%#{alpharize(city)}%"
+    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_ciudad LIKE ? OR fts_zip_codes.d_mnpio LIKE ?', city, city)
   }
 
   scope :find_by_colony, lambda { |colony|
-    unaccent('d_asenta', colony)
+    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_asenta LIKE ?', "%#{alpharize(colony)}%")
   }
 
   def self.search(params = {})
@@ -29,15 +30,11 @@ class ZipCode < ApplicationRecord
       zip_codes = zip_codes.find_by_zip_code(params['cp'] || params['zip_code'])
     end
 
-    if params[:state].present?
-      zip_codes = zip_codes.find_by_state(params['state'])
-    end
+    zip_codes = zip_codes.find_by_state(params['state']) if params[:state].present?
 
     zip_codes = zip_codes.find_by_city(params['city']) if params['city'].present?
 
-    if params[:colony].present?
-      zip_codes = zip_codes.find_by_colony(params['colony'])
-    end
+    zip_codes = zip_codes.find_by_colony(params['colony']) if params[:colony].present?
 
     zip_codes
   end
@@ -80,9 +77,26 @@ class ZipCode < ApplicationRecord
     )
   end
 
-  private
+  def self.build_indexes
+    values = all.map { |item| build_index(item) }
+    sql = <<~SQL.strip
+      INSERT INTO fts_zip_codes (zip_code_id, d_ciudad, d_estado, d_asenta, d_mnpio)
+      VALUES #{values.join(',')}
+    SQL
+    connection.execute sql
+  end
+
+  def self.alpharize(text)
+    text.downcase.parameterize(separator: ' ')
+  end
 
   def self.unaccent(column_name, value)
-    where("unaccent(#{column_name}) ILIKE unaccent(?)", "%#{value}%")
+    where("lower(unaccent(#{column_name})) LIKE lower(unaccent(?))", "%#{value}%")
+  end
+
+  def self.build_index(item)
+    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta', 'd_mnpio').transform_values do |v|
+      ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v
+    end.values.join(',')})"
   end
 end

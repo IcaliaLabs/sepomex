@@ -36,7 +36,7 @@
   // Only bring up the services required by the development container - VSCode
   // will bring up all services unless this is configured:
   "runServices": [
-    "postgres"
+    "devcontainer" // had to add this when removing the postgres service...
   ],
 
   "workspaceFolder": "/workspaces/sepomex",

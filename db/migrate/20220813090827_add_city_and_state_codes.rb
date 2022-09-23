@@ -5,10 +5,12 @@ class AddCityAndStateCodes < ActiveRecord::Migration[6.0]
     add_column :states, :inegi_state_code, :integer, limit: 2
     execute <<~SQL.squish
       WITH "data" AS (
-        SELECT DISTINCT ON ("c_estado")
-          "d_estado" AS "name", "c_estado"::int AS "inegi_state_code"
+        SELECT
+          MIN("d_estado") AS "name",
+          CAST("c_estado" AS INTEGER) AS "inegi_state_code"
         FROM "zip_codes"
         WHERE "c_estado" IS NOT NULL
+        GROUP BY "c_estado"
       ), "updates" AS (
         SELECT "s"."id", "d"."inegi_state_code"
         FROM "data" AS "d" INNER JOIN "states" AS "s" ON "d"."name" = "s"."name"
@@ -22,13 +24,14 @@ class AddCityAndStateCodes < ActiveRecord::Migration[6.0]
     add_column :cities, :sepomex_city_code, :integer, limit: 2
     execute <<~SQL.squish
       WITH "data" AS (
-        SELECT DISTINCT ON ("c_estado", "c_cve_ciudad")
-          "d_ciudad" AS "name",
-          "c_estado"::int AS "inegi_state_code",
-          "c_cve_ciudad"::int AS "sepomex_city_code"
+        SELECT
+          MIN("d_ciudad") AS "name",
+          CAST("c_estado" AS INTEGER) AS "inegi_state_code",
+          CAST("c_cve_ciudad" AS INTEGER) AS "sepomex_city_code"
         FROM "zip_codes"
         WHERE "c_cve_ciudad" IS NOT NULL
-        ORDER BY "c_estado", "c_cve_ciudad" ASC
+        GROUP BY "c_estado", "c_cve_ciudad"
+        ORDER BY "c_estado" ASC, "c_cve_ciudad" ASC
       ), "updates" AS (
         SELECT "c"."id", "d"."sepomex_city_code"
         FROM

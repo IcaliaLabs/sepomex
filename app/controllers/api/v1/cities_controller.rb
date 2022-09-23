@@ -3,7 +3,8 @@
 class Api::V1::CitiesController < ApplicationController
   # GET '/cities'
   def index
-    paginate City.unscoped, per_page: 15
+    per_page = (params[:per_page] unless params[:per_page].to_i > 200) || 15
+    paginate City.unscoped, per_page: per_page
   end
 
   # GET '/cities/:id'
