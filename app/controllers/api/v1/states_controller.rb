@@ -3,7 +3,8 @@
 class Api::V1::StatesController < ApplicationController
   # GET '/states'
   def index
-    paginate State.unscoped, per_page: 15
+    per_page = (params[:per_page] unless params[:per_page].to_i > 200) || 15
+    paginate State.unscoped, per_page: per_page
   end
 
   # GET '/states/:id'

@@ -43,14 +43,23 @@ We currently provide 4 kind of resources:
 - **Municipalities**: [http://sepomex.icalialabs.com/municipalities](https://sepomex.icalialabs.com/api/v1/municipalities)
 - **Cities**: [http://sepomex.icalialabs.com/cities](https://sepomex.icalialabs.com/api/v1/cities)
 
+### Items per page
+The 4 resources you can query are paginated with 15 items per page by default. You can change the number of items per page by adding the `per_page` parameter to the query string.
+
+```bash
 ### ZipCodes
 
 In order to provide more flexibility to search a zip code, whether is by city, colony, state or zip code you can now send multiple parameters to make the appropiate search. You can fetch the:
+### ZipCodes
+```bash
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes?per_page=200
+```
+You can't request more than 200 items per page, if you do so, the API will return 15 items per page.
 
-#### all
+Also, you can mix the `per_page` parameter with the `page` parameter to get the desired page, even with the search parameters.
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes?per_page=200&page=2
 ```
 
 ##### Response
