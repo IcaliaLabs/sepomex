@@ -77,8 +77,6 @@ class ZipCode < ApplicationRecord
     )
   end
 
-  # scope :build_indexes, -> { all.each(&:save) }
-
   def self.build_indexes
     values = all.map { |item| build_index(item) }
     sql = <<~SQL.strip
@@ -87,8 +85,6 @@ class ZipCode < ApplicationRecord
     SQL
     connection.execute sql
   end
-
-  private
 
   def self.alpharize(text)
     text.downcase.parameterize(separator: ' ')
@@ -99,13 +95,8 @@ class ZipCode < ApplicationRecord
   end
 
   def self.build_index(item)
-    # data = self.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta').values.map do |value|
-    #   (value.is_a? Integer) ? value : value.downcase.parameterize(separator: " ")
-    # end
-    # data.join(',')
-    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta', 'd_mnpio').transform_values {
-      |v| ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v
-    }.values.join(",")})"
-    # data['zip_code_id'] = data.delete('id')
+    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta', 'd_mnpio').transform_values do |v|
+      ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v
+    end.values.join(',')})"
   end
 end
