@@ -96,13 +96,13 @@ jobs:
           TESTING_IMAGE_TAG: ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
         # I don't know why this doesn't work on GitHub Actions with Docker Compose v2:
         run: docker compose --profile ci run --rm tests
-
-      - name: Publish test coverage report to CodeClimate
-        uses: icalia-actions/cc-test-reporter-base@v0.0.2
-        if: always()
-        with:
-          command: after-build --coverage-input-type simplecov --prefix /workspaces/sepomex
-          version: "0.10.3"
+      # Will publish report later
+      # - name: Publish test coverage report to CodeClimate
+      #   uses: icalia-actions/cc-test-reporter-base@v0.0.2
+      #   if: always()
+      #   with:
+      #     command: after-build --coverage-input-type simplecov --prefix /workspaces/sepomex
+      #     version: "0.10.3"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0.6.0
