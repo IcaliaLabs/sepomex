@@ -128,9 +128,9 @@ jobs:
             DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
             DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
           tags: |
-            us-central1-docker.pkg.dev/sepomex/sepomex/sepomex-app:${{ steps.variables.outputs.git-commit-short-sha }}
-            us-central1-docker.pkg.dev/sepomex/sepomex/sepomex-app:${{ steps.variables.outputs.git-dasherized-branch }}
-            us-central1-docker.pkg.dev/sepomex/sepomex/sepomex-app:latest
+            us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:${{ steps.variables.outputs.git-commit-short-sha }}
+            us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:${{ steps.variables.outputs.git-dasherized-branch }}
+            us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -167,7 +167,7 @@ jobs:
       environment: ${{ github.head_ref }}
       deploy-name: pr${{ github.event.pull_request.number }}
       cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}-${{ needs.test-and-build.outputs.build-timestamp }}
-      container-image: us-central1-docker.pkg.dev/sepomex/sepomex/sepomex-app:${{ needs.test-and-build.outputs.git-dasherized-branch }}
+      container-image: us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:${{ needs.test-and-build.outputs.git-dasherized-branch }}
 
   production:
     name: Production
@@ -179,4 +179,4 @@ jobs:
       environment: production
       deploy-name: production
       cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}-${{ needs.test-and-build.outputs.build-timestamp }}
-      container-image: us-central1-docker.pkg.dev/sepomex/sepomex/sepomex-app:main
+      container-image: us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:main
