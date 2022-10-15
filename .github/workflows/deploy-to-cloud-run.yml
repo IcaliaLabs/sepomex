@@ -1,0 +1,76 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      deploy-name:
+        required: true
+        type: string
+      container-image:
+        required: true
+        type: string
+      cloud-run-service-suffix:
+        required: false
+        type: string
+
+jobs:
+  deploy_to_cloud_run:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_NAME: sepomex_${{ inputs.deploy-name }}
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout the code
+        uses: actions/checkout@v3.0.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.6.0
+        with:
+          service_account: gh-actions-runner@sepomex-365521.iam.gserviceaccount.com
+          workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/ci-workload-pool/providers/github
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.6.0
+
+      - name: URLEncode Cloud SQL Instance string
+        id: url-encode-cloud-sql-instance
+        run: |-
+          ruby -e 'require "erb"; puts "::set-output name=encoded-value::#{ERB::Util.url_encode("${{ inputs.cloud-sql-instance }}")}"'
+
+      - name: Register Deploy Start on Github
+        uses: bobheadxi/deployments@v1.3.0
+        id: deploy-start
+        with:
+          step: start
+          ref: ${{ github.head_ref }}
+          env: ${{ inputs.environment }}
+          token: ${{ github.token }}
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0.9.0
+        with:
+          region: us-central1
+          project_id: sepomex
+          service: assessment-tool-${{ inputs.deploy-name }}
+          suffix: ${{ inputs.cloud-run-service-suffix }}
+          image: ${{ inputs.container-image }}
+          env_vars: |
+            GOOGLE_CLOUD_PROJECT=sepomex
+          flags: |-
+            --allow-unauthenticated
+#            --service-account sepomex@sepomex-365521.iam.gserviceaccount.com
+
+
+      - name: Finalize the deployment state on Github
+        uses: bobheadxi/deployments@v1.3.0
+        if: always()
+        with:
+          step: finish
+          status: ${{ job.status }}
+          token: ${{ github.token }}
+          env_url: ${{ steps.deploy.outputs.url }}
+          env: ${{ steps.deploy-start.outputs.env }}
+          deployment_id: ${{ steps.deploy-start.outputs.deployment_id }}

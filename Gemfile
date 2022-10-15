@@ -66,4 +66,7 @@ group :test do
   gem 'factory_bot_rails', '~> 6.1'
   gem 'rspec-rails', '~> 4.0', '>= 4.0.1'
   gem 'shoulda-matchers', '~> 4.3'
+
+  # Generates test vs. code coverage reports
+  gem 'simplecov', '~> 0.21.2', require: false
 end

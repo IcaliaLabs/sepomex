@@ -15,3 +15,6 @@ tmp/cache
 # Ignore database dumps
 db/dumps/*
 !db/dumps/.keep
+
+# Ignore coverage reports
+coverage/*

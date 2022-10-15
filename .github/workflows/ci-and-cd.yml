@@ -1,12 +1,183 @@
 name: CI & CD
 
 on:
-  # Trigger the workflow on pushes to the main branch, including PR merges:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Generate a GitHub token that can be exchanged with Google Cloud - see
+# https://github.com/google-github-actions/auth/tree/v0.6.0#setting-up-workload-identity-federation
+permissions:
+  contents: read
+  id-token: write
+  deployments: write
 
 jobs:
+  # On this project, I went with a single "Test & Build" job, since each job
+  # gets billed rounded to the next minute, and having multiple separated jobs
+  # is not worth at the beginning of the project.
+
+  # Keep in mind that, if the test suite becomes too big, and test threading is
+  # required, we might need to revert back to separated jobs.
   test-and-build:
-    name: Integration
-    uses: ./.github/workflows/test-and-build.yml
+    name: Test and Build
+    runs-on: ubuntu-latest
+    outputs:
+      build-timestamp: ${{ steps.build-timestamp.outputs.timestamp }}
+      git-commit-short-sha: ${{ steps.variables.outputs.git-commit-short-sha }}
+      git-dasherized-branch: ${{ steps.variables.outputs.git-dasherized-branch }}
+      container-image-digest: ${{ steps.build-and-push-release-image.outputs.digest }}
+    env:
+      CC_TEST_REPORTER_ID: 7ef7aa02edce80c8cd0ff58ba3645dbee5afbea5ecc195f8edc95b54a9a6c4f6
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3.0.0
+
+      - # We'll generate a unique id that we'll use to identify the build run
+        # on our systems
+        name: Generate UUID for build
+        id: uuidgen
+        run: echo "::set-output name=uuid::$(uuidgen)"
+
+      - name: Set additional variables
+        id: variables
+        uses: icalia-actions/common-variables@v0.0.3
+
+      - name: Set build timestamp
+        id: build-timestamp
+        run: echo "::set-output name=timestamp::$(date +%s)"
+
+      - name: Map GitHub Actor to Slack
+        id: map-actor-to-slack
+        uses: icalia-actions/map-github-actor@v0.0.2
+        with:
+          actor-map: '{"memoalv":"U0219UXQ203","Wikitelmex":"U038GD5HSN4"}'
+          default-mapping: C045Q0XS3M4 # bench projects
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1.6.0
+
+      - name: Build Test Image
+        id: build-test-image
+        uses: docker/build-push-action@v2.9.0
+        with:
+          load: true
+          target: testing
+          platforms: linux/amd64
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
+            DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
+          tags: |
+            sepomex:testing-${{ steps.variables.outputs.git-dasherized-branch }}
+            sepomex:testing
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Prepare test coverage reporting on CodeClimate
+        uses: icalia-actions/cc-test-reporter-base@v0.0.2
+        with:
+          command: before-build
+          version: "0.10.3"
+
+      - name: Run tests
+        env:
+          UID: ${{ steps.variables.outputs.runner-uid }}
+          USER: ${{ steps.variables.outputs.runner-user }}
+          TESTING_IMAGE_TAG: ":testing-${{ steps.variables.outputs.git-dasherized-branch }}"
+        # I don't know why this doesn't work on GitHub Actions with Docker Compose v2:
+        run: docker compose --profile ci run --rm tests
+      # Will publish report later
+      # - name: Publish test coverage report to CodeClimate
+      #   uses: icalia-actions/cc-test-reporter-base@v0.0.2
+      #   if: always()
+      #   with:
+      #     command: after-build --coverage-input-type simplecov --prefix /workspaces/sepomex
+      #     version: "0.10.3"
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.6.0
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+          # service_account: gh-actions-runner@sepomex-365521.iam.gserviceaccount.com
+          # workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/ci-workload-pool/providers/github
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.6.0
+
+      - name: Authorize push to Google Cloud Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build & Push Release Image
+        id: build-and-push-release-image
+        uses: docker/build-push-action@v2.9.0
+        with:
+          push: true
+          target: release
+          platforms: linux/amd64
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: |
+            DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
+            DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
+          tags: |
+            us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:${{ steps.variables.outputs.git-commit-short-sha }}
+            us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:${{ steps.variables.outputs.git-dasherized-branch }}
+            us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Notify main build failure
+        uses: slackapi/slack-github-action@v1.18.0
+        if: ${{ failure() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.ICALIALABS_SLACK_BOT_TOKEN }}
+          NOTIFY_COMMIT_URL: <${{ github.event.commits[0].url }}|${{ steps.variables.outputs.git-commit-short-sha }}>
+        with:
+          channel-id: C045Q0XS3M4
+          slack-message: |-
+            :exclamation: Main commit ${{ env.NOTIFY_COMMIT_URL }} failed to test & build the app.
+
+      - name: Notify PR build failure
+        uses: slackapi/slack-github-action@v1.18.0
+        if: ${{ failure() && github.event_name == 'pull_request' }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.ICALIALABS_SLACK_BOT_TOKEN }}
+          NOTIFY_PR_URL: <${{ github.event.pull_request.html_url }}|"${{ github.event.pull_request.title }}">
+          NOTIFY_PR_COMMIT_URL: <${{ github.event.pull_request.html_url }}/commits/${{ github.event.pull_request.head.sha }}|${{ steps.variables.outputs.git-commit-short-sha }}>
+        with:
+          channel-id: ${{ steps.map-actor-to-slack.outputs.actor-mapping }}
+          slack-message: |-
+            :exclamation: Pull Request ${{ env.NOTIFY_PR_URL }} (${{ env.NOTIFY_PR_COMMIT_URL }}) failed to test & build the app.
+
+  review:
+    name: Review
+    if: ${{ github.event_name == 'pull_request' }}
+    uses: ./.github/workflows/deploy-to-cloud-run.yml
+    needs:
+      - test-and-build
+    with:
+      environment: ${{ github.head_ref }}
+      deploy-name: pr${{ github.event.pull_request.number }}
+      cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}-${{ needs.test-and-build.outputs.build-timestamp }}
+      container-image: us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:${{ needs.test-and-build.outputs.git-dasherized-branch }}
+
+  production:
+    name: Production
+    if: ${{ github.ref == 'refs/heads/main' }}
+    uses: ./.github/workflows/deploy-to-cloud-run.yml
+    needs:
+      - test-and-build
+    with:
+      environment: production
+      deploy-name: production
+      cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}-${{ needs.test-and-build.outputs.build-timestamp }}
+      container-image: us-central1-docker.pkg.dev/icalialabs-sepomex/sepomex/sepomex-app:main
