@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -34,3 +37,16 @@ jobs:
 
     - name: Build Docker Image
       run: docker build -t $IMAGE_NAME:latest .
+
+    - name: Configure Docker Client
+      run: |-
+        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+    - name: Push Docker Image to Artifact Registry
+      env:
+        GIT_TAG: v0.1.0
+      run: |-
+        docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+        docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+        docker push us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+        docker push us-central1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
