@@ -6,7 +6,31 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+  deployments: write
+
 jobs:
-  test-and-build:
-    name: Integration
-    uses: ./.github/workflows/test-and-build.yml
+  build-and-push-to-gcp:
+    name: Build and Push to GCP
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: sepomex
+      PROJECT_ID: sepomex-365521
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: github-actions@sepomex-365521.iam.gserviceaccount.com
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.6.0
+
+    - name: Build Docker Image
+      run: docker build -t $IMAGE_NAME:latest .
