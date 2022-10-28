@@ -57,11 +57,6 @@ jobs:
 
     - name: Deploy to Cloud Run
       id: deploy
-      uses: google-github-actions/deploy-cloudrun@v0
-      with:
-        service: ${{ env.SERVICE }}
-        region: ${{ env.REGION }}
-        image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
-
-    - name: Show Output
-      run: echo ${{ steps.deploy.outputs.url }}
+      run: |-
+        gcloud config set project ${{ env.PROJECT_ID }}
+        gcloud run deploy ${{ env.SERVICE }} --image ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --q --region ${{ env.REGION }} --port 3000 --allow-unauthenticated
