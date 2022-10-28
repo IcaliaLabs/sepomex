@@ -239,6 +239,9 @@ RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 # Set the installed app directory as the working directory:
 WORKDIR /workspaces/sepomex
 
+# Grant permission
+RUN ["chmod", "+x", "/workspaces/sepomex/bin/entrypoint"]
+
 # Set the entrypoint script:
 ENTRYPOINT [ "/workspaces/sepomex/bin/entrypoint" ]
 
