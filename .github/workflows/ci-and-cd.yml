@@ -58,5 +58,4 @@ jobs:
     - name: Deploy to Cloud Run
       id: deploy
       run: |-
-        gcloud config set project ${{ env.PROJECT_ID }}
-        gcloud run deploy ${{ env.SERVICE }} --image ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} --q --region ${{ env.REGION }} --port 3000 --allow-unauthenticated
+        gcloud run deploy ${{ env.SERVICE }} --image ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }} -q --region ${{ env.REGION }} --port 3000 --allow-unauthenticated
