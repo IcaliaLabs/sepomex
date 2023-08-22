@@ -43,8 +43,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0.6.0
         with:
-          service_account: ica-cloud-run@sepomex-365521.iam.gserviceaccount.com
-          workload_identity_provider: projects/1083490945951/locations/global/workloadIdentityPools/ci-workload-pool/providers/github
+          service_account: github-actions@sepomex-365521.iam.gserviceaccount.com
+          workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/github-pool/providers/github-provider
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.6.0
@@ -85,7 +85,7 @@ jobs:
             --allow-unauthenticated
             --add-cloudsql-instances ${{ inputs.cloud-sql-instance }}
             --min-instances=${{ inputs.cloud-run-minimum-instances }}
-            --service-account ica-cloud-run@sepomex-365521.iam.gserviceaccount.com
+            --service-account github-actions@sepomex-365521.iam.gserviceaccount.com
 
       - name: Finalize the deployment state on Github
         uses: bobheadxi/deployments@v1.3.0
