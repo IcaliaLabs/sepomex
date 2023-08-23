@@ -28,8 +28,8 @@ jobs:
       environment: ${{ github.head_ref }}
       deploy-name: pr${{ github.event.pull_request.number }}
       cloud-sql-instance: sepomex-365521:us-central1:sepomex
-      cloud-sql-username-secret: database-username:latest
-      cloud-sql-password-secret: database-password:latest
+      #cloud-sql-username-secret: database-username:latest
+      #cloud-sql-password-secret: database-password:latest
       cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}
       cloud-run-container-image: us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex@${{ needs.test-and-build.outputs.container-image-digest }}
     secrets: inherit

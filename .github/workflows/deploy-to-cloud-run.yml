@@ -13,11 +13,11 @@ on:
       cloud-sql-username-secret:
         required: false
         type: string
-        default: postgres-dev-username:latest
+        default: projects/582875546495/secrets/database-username:latest
       cloud-sql-password-secret:
         required: false
         type: string
-        default: postgres-dev-password:latest
+        default: projects/582875546495/secrets/database-password:latest
       cloud-run-container-image:
         required: true
         type: string
