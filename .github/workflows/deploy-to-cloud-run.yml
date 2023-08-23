@@ -34,7 +34,7 @@ jobs:
     name: Service Deploy
     runs-on: ubuntu-latest
     env:
-      DATABASE_NAME: sepomex-${{ inputs.deploy-name }}
+      DATABASE_NAME: sepomex_${{ inputs.deploy-name }}
     steps:
       # actions/checkout MUST come before auth
       - name: Checkout the code
