@@ -240,7 +240,7 @@ RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 WORKDIR /workspaces/sepomex
 
 # Set the entrypoint script:
-# ENTRYPOINT [ "/workspaces/sepomex/bin/entrypoint" ]
+ENTRYPOINT [ "/workspaces/sepomex/bin/entrypoint" ]
 
 # Set the default command:
 CMD [ "puma" ]
