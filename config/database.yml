@@ -50,3 +50,4 @@ test:
 
 production:
   <<: *default
+  password: <%= ENV['DATABASE_PASSWORD'] %>
