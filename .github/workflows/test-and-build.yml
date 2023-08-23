@@ -110,5 +110,5 @@ jobs:
             us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:${{ steps.variables.outputs.git-commit-short-sha }}
             us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:${{ steps.variables.outputs.git-dasherized-branch }}
             us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=blockcluster
+          cache-to: type=gha,mode=max,scope=blockcluster
