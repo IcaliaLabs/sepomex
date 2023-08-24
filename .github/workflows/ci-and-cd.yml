@@ -33,8 +33,8 @@ jobs:
       cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}
       cloud-run-container-image: us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex@${{ needs.test-and-build.outputs.container-image-digest }}
 
-  deploy-to-staging:
-    name: Staging
+  deploy-to-production:
+    name: Production
     uses: ./.github/workflows/deploy-to-cloud-run.yml
     needs:
       - test-and-build
