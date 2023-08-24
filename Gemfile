@@ -9,7 +9,7 @@ ruby '2.7.5'
 gem 'rails', '~> 6.0', '>= 6.0.3.2'
 
 # Use pg as the database for Active Record
-gem 'pg'
+gem 'pg', '~> 1.1'
 
 # Use Puma as the app server
 gem 'puma', '~> 4.3'
@@ -30,6 +30,9 @@ gem 'pagy', '~> 3.8', '>= 3.8.2'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors', '~> 1.1', '>= 1.1.1'
 # Testing
+
+# Read secrets from Google Cloud Secret Manager
+gem 'google-cloud-secret_manager', '~> 1.1', '>= 1.1.3'
 
 group :development, :test do
   gem 'listen', '>= 3.0.5', '< 3.2'
