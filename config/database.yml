@@ -20,7 +20,7 @@ default: &default
   # For details on connection pooling, see rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  # schema_search_path: public,partitioning
+  schema_search_path: public,partitioning
   url: <%= ENV.fetch('DATABASE_URL', 'postgres://localhost:5432') %>
 
 development:
@@ -50,6 +50,6 @@ test:
 
 production:
   <<: *default
-  # password: <%= ENV['DATABASE_PASSWORD'] %>
-  # username: <%= ENV['DATABASE_USERNAME'] %>
-  # url: <%= ENV.fetch('DATABASE_URL') %>
+  password: <%= ENV.fetch('DATABASE_PASSWORD') %>
+  username: <%= ENV.fetch('DATABASE_USERNAME') %>
+  url: <%= ENV.fetch('DATABASE_URL') %>
