@@ -86,7 +86,6 @@ jobs:
             --add-cloudsql-instances ${{ inputs.cloud-sql-instance }}
             --min-instances=${{ inputs.cloud-run-minimum-instances }}
             --service-account github-actions@sepomex-365521.iam.gserviceaccount.com
-            --quiet=false
 
       - name: Finalize the deployment state on Github
         uses: bobheadxi/deployments@v1.3.0
