@@ -21,3 +21,4 @@ db/dumps/*
 /tmp/pids/*
 !/tmp/pids/
 !/tmp/pids/.keep
+!/tmp/pids/server.pid
