@@ -2,12 +2,9 @@
 
 /db/development.sqlite3
 /log/development.log
-/tmp
-tmp/cache/bootsnap-load-path-cache
 log/test.log
 
 docker-compose.override.yml
-tmp/cache
 
 # Ignore history files
 **/.*_hist*
@@ -15,3 +12,12 @@ tmp/cache
 # Ignore database dumps
 db/dumps/*
 !db/dumps/.keep
+
+# Ignore all logfiles and tempfiles.
+/tmp/*
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
