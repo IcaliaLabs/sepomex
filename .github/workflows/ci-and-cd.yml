@@ -17,6 +17,7 @@ jobs:
   test-and-build:
     name: Integration
     uses: ./.github/workflows/test-and-build.yml
+    secrets: inherit
 
   deploy-to-staging:
     name: Staging
