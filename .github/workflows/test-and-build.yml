@@ -53,7 +53,7 @@ jobs:
 
       - name: Build Test Image
         id: build-test-image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3.1.1
         with:
           load: true
           target: testing
@@ -84,7 +84,7 @@ jobs:
             tmp/capybara/screenshots
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0.6.0
+        uses: google-github-actions/auth@v0.8.0
         with:
           service_account: github-actions@sepomex-365521.iam.gserviceaccount.com
           workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/github-pool/providers/github-provider
@@ -110,5 +110,5 @@ jobs:
             us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:${{ steps.variables.outputs.git-commit-short-sha }}
             us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:${{ steps.variables.outputs.git-dasherized-branch }}
             us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:latest
-          cache-from: type=gha,scope=blockcluster
-          cache-to: type=gha,mode=max,scope=blockcluster
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
