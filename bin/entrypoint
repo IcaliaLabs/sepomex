@@ -24,9 +24,7 @@ def run_database_seeds
 end
 
 def load_db
-  if Rails.env.production? && ENV['DEPLOY_NAME'] == 'production'
-    Municipality.count.zero? && (bundle exec rake 'data:load')
-  end
+  system('rails data:load')
 end
 
 set_given_or_default_command
