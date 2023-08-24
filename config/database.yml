@@ -50,6 +50,6 @@ test:
 
 production:
   <<: *default
-  password: <%= ENV.fetch('DATABASE_PASSWORD') %>
-  username: <%= ENV.fetch('DATABASE_USERNAME') %>
-  url: <%= ENV.fetch('DATABASE_URL') %>
+  # password: <%= ENV.fetch('DATABASE_PASSWORD') %>
+  # username: <%= ENV.fetch('DATABASE_USERNAME') %>
+  # url: <%= ENV.fetch('DATABASE_URL') %>
