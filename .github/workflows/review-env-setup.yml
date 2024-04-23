@@ -1,0 +1,48 @@
+name: Review Environment Setup
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+
+jobs:
+  create_deployment:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    name: Create deployment
+    runs-on: ubuntu-latest
+    env:
+      DB_NAME: "sepomex-pr${{ github.event.pull_request.number }}"
+      GOOGLE_CLOUD_PROJECT: sepomex-365521
+
+    # Generate a GitHub token that can be exchanged with Google Cloud - see
+    # https://github.com/google-github-actions/auth/tree/v0.6.0#setting-up-workload-identity-federation
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout the code
+        uses: actions/checkout@v3.1.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0.6.0
+        with:
+          service_account: github-actions@sepomex-365521.iam.gserviceaccount.com
+          workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.6.0
+
+      - name: Ensure a review database exists
+        run: |-
+          gcloud sql databases describe ${{ env.DB_NAME }} \
+            --instance=sepomex \
+            --format="value(name)" \
+          && echo "Database ${{ env.DB_NAME }} already exists" \
+          || gcloud sql databases create ${{ env.DB_NAME }} \
+            --instance=sepomex

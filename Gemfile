@@ -31,6 +31,9 @@ gem 'pagy', '~> 3.8', '>= 3.8.2'
 gem 'rack-cors', '~> 1.1', '>= 1.1.1'
 # Testing
 
+# Read secrets from Google Cloud Secret Manager
+gem 'google-cloud-secret_manager', '~> 1.1', '>= 1.1.3'
+
 group :development, :test do
   gem 'listen', '>= 3.0.5', '< 3.2'
 

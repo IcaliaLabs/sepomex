@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+# Entrypoint Script
+#
+# This scipt is executed by Docker on container start on release images (i.e.
+# live environments)
+
+def set_given_or_default_command
+  ARGV.concat %w[puma] if ARGV.empty?
+end
+
+def execute_given_or_default_command
+  exec(*ARGV)
+end
+
+def run_migrations
+  raise('Migrations failed') unless system('rails db:migrate')
+end
+
+def run_database_seeds
+  raise('Seeds failed') unless system('rails db:seed')
+end
+
+def load_db
+  system('rails data:load')
+end
+
+set_given_or_default_command
+run_migrations
+run_database_seeds
+load_db
+execute_given_or_default_command

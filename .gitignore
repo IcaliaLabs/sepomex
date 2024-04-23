@@ -36,6 +36,11 @@
 
 .DS_Store
 
+/db/development.sqlite3
+/log/development.log
+log/test.log
+
+
 docker-compose.override.yml
 
 # Ignore history files
@@ -44,3 +49,13 @@ docker-compose.override.yml
 # Ignore database dumps
 db/dumps/*
 !db/dumps/.keep
+
+# Ignore all logfiles and tempfiles.
+/tmp/*
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+!/tmp/pids/server.pid
