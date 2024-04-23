@@ -44,33 +44,15 @@
   // An array of extension IDs that specify the extensions to install inside the
   // container when you first attach to it.
   "extensions": [
-    // Integrates ESLint into VS Code:
     "dbaeumer.vscode-eslint",
-
-    // Provides enhanced Ruby language and debugging support for Visual Studio
-    // Code:
     "rebornix.ruby",
-
-    // execute rubocop for current Ruby code.
     "misogi.ruby-rubocop",
-
-    // A language server that provides intellisense, code completion, and inline
-    // documentation for Ruby:
     "castwide.solargraph",
-
-    // Search modules, class and methods in ruby files using vscode go to symbol:
     "miguel-savignano.ruby-symbols",
-
-    // Git Lens:
     "eamodio.gitlens",
-
-    // Github Pull Requests and Issues:
     "github.vscode-pull-request-github",
-
-    // Remotely browse and edit any GitHub repository:
     "github.remotehub",
-
-    // GitHub Copilot:
-    "github.copilot"
+    "github.copilot",
+    "qwtel.sqlite-viewer"
   ]
 }

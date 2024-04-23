@@ -14,4 +14,12 @@ namespace :data do
       load_db.perform!
     end
   end
+
+  task loadev: %i[environment] do
+    if Municipality.count.zero?
+      load_db = LoadCsvToDatabase.new
+      load_db.on_load_progress { |message, _data| print_flush message }
+      load_db.perform!
+    end
+  end
 end

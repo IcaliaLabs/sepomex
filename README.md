@@ -392,7 +392,6 @@ $ rails db:migrate
 5. Next you should populate the database:
 
 ```bash
-$ rails db:seed
 $ rake data:load
 ```
 This operation will take some time, due to the number of records. Rake data load will load the data from the csv files into the database, like seed does. Also, it will create the indexes for the database.
