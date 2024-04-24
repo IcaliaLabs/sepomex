@@ -21,7 +21,7 @@
 
 # Ignore pidfiles, but keep the directory.
 /tmp/pids/*
-!/tmp/pids/
+!/tmp/pids
 !/tmp/pids/.keep
 
 # Ignore uploaded files in development.
