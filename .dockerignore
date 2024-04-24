@@ -11,6 +11,8 @@ log/*.log
 
 tmp/*
 !tmp/pids/
+!tmp/pids
+!tmp/pids/.keep
 
 .rspec
 spec/
