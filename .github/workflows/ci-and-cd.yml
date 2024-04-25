@@ -1,10 +1,11 @@
 name: CI & CD
 
 on:
+  workflow_dispatch:
   # Trigger the workflow on pushes to the main branch, including PR merges:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 # Generate a GitHub token that can be exchanged with Google Cloud - see
 # https://github.com/google-github-actions/auth/tree/v0.6.0#setting-up-workload-identity-federation
