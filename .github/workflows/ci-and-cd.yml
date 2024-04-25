@@ -1,7 +1,9 @@
 name: CI & CD
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - feature/use-internal-database #testing
   # Trigger the workflow on pushes to the main branch, including PR merges:
   # push:
   #   branches:
