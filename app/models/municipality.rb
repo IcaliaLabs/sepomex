@@ -10,9 +10,7 @@ class Municipality < ApplicationRecord
   def self.search(params = {})
     municipalities = all
 
-    if params[:zip_code].present?
-      municipalities = municipalities.find_by_zip_code(params[:zip_code])
-    end
+    municipalities = municipalities.find_by_zip_code(params[:zip_code]) if params[:zip_code].present?
 
     municipalities
   end

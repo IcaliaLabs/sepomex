@@ -14,7 +14,7 @@ RSpec.describe 'Municipality requests' do
 
     it 'return results' do
       results = JSON.parse(response.body)
-      
+
       expect(results).to include('municipalities')
     end
 
