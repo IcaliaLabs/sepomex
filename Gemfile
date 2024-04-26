@@ -59,7 +59,7 @@ group :development do
   gem 'rubocop-rspec',       '~> 2.8',               require: false
 
   # IDE tools for code completion, inline documentation, and static analysis
-  gem 'solargraph', '~> 0.45.0', require: false
+  gem 'solargraph', '~> 0.50.0', require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
