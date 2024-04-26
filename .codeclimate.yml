@@ -14,9 +14,10 @@ plugins:
       - php
   fixme:
     enabled: true
-  rubocop:
-    enabled: true
-    channel: "rubocop-1-31-0"
+  # disabled due a internal codeclimate issue on they server
+  # rubocop:
+  #   enabled: true
+  #   channel: "rubocop-1-31-0"
 ratings:
   paths:
   - Gemfile.lock
