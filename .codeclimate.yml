@@ -1,5 +1,5 @@
 ---
-engines:
+plugins:
   brakeman:
     enabled: true
   bundler-audit:
@@ -16,7 +16,7 @@ engines:
     enabled: true
   rubocop:
     enabled: true
-    channel: "rubocop-1.25.1"  # specify the version of RuboCop here
+    channel: "rubocop-1-31-0"  # specify the version of RuboCop here
 ratings:
   paths:
   - Gemfile.lock
