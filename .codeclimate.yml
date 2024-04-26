@@ -14,9 +14,9 @@ plugins:
       - php
   fixme:
     enabled: true
-  rubocop:
-    enabled: true
-    channel: "rubocop-1-31-0"  # specify the version of RuboCop here
+  # rubocop:
+  #   enabled: true
+  #   channel: "rubocop-1-31-0"
 ratings:
   paths:
   - Gemfile.lock
