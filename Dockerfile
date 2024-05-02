@@ -1,8 +1,8 @@
 # Stage 1: Runtime =============================================================
 # The minimal package dependencies required to run the app in the release image:
 
-# Use the official Ruby 2.7.5 Slim Bullseye image as base:
-FROM ruby:2.7.5-slim-bullseye AS runtime
+# Use the official Ruby 3.0 Slim Bullseye image as base:
+FROM ruby:3.0.7-slim-bullseye AS runtime
 
 # We'll set MALLOC_ARENA_MAX for optimization purposes & prevent memory bloat
 # https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html
@@ -13,7 +13,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
-    libpq5 \
+    libsqlite3-0 \
     openssl \
     # Required by mimemagic gem:
     shared-mime-info \
@@ -33,7 +33,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     build-essential \
     git \
-    libpq-dev
+    libsqlite3-dev
 
 # Receive the developer user's UID and USER:
 ARG DEVELOPER_UID=1000
@@ -215,6 +215,8 @@ RUN rm -rf \
 # Use the "runtime" stage as base:
 FROM runtime AS release
 
+ARG DEPLOY_NAME=development
+
 # Copy the remaining installed gems from the "builder" stage:
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 
@@ -228,16 +230,22 @@ USER nobody
 # Set the RAILS and PORT default values:
 ENV HOME=/workspaces/sepomex \
     RAILS_ENV=production \
+    DEPLOY_NAME=${DEPLOY_NAME} \
     RAILS_FORCE_SSL=yes \
     RAILS_LOG_TO_STDOUT=yes \
     RAILS_SERVE_STATIC_FILES=yes \
-    PORT=3000
+    PORT=80
 
 # Test if the rails app loads:
 RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 
 # Set the installed app directory as the working directory:
 WORKDIR /workspaces/sepomex
+
+# Generate the sqlite production database:
+RUN rails db:create \
+ && rails db:migrate \
+ && rake data:load
 
 # Set the entrypoint script:
 ENTRYPOINT [ "/workspaces/sepomex/bin/entrypoint" ]

@@ -43,14 +43,23 @@ We currently provide 4 kind of resources:
 - **Municipalities**: [http://sepomex.icalialabs.com/municipalities](https://sepomex.icalialabs.com/api/v1/municipalities)
 - **Cities**: [http://sepomex.icalialabs.com/cities](https://sepomex.icalialabs.com/api/v1/cities)
 
+### Items per page
+The 4 resources you can query are paginated with 15 items per page by default. You can change the number of items per page by adding the `per_page` parameter to the query string.
+
+```bash
 ### ZipCodes
 
 In order to provide more flexibility to search a zip code, whether is by city, colony, state or zip code you can now send multiple parameters to make the appropiate search. You can fetch the:
+### ZipCodes
+```bash
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes?per_page=200
+```
+You can't request more than 200 items per page, if you do so, the API will return 15 items per page.
 
-#### all
+Also, you can mix the `per_page` parameter with the `page` parameter to get the desired page, even with the search parameters.
 
 ```bash
-curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes 
+curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes?per_page=200&page=2
 ```
 
 ##### Response
@@ -76,7 +85,7 @@ curl -X GET https://sepomex.icalialabs.com/api/v1/zip_codes
       "d_zona": "Urbano",
       "c_cve_ciudad": "01"
     },
-    ... 
+    ...
   ],
   "meta": {
     "pagination": {
@@ -137,7 +146,7 @@ curl -X GET https://sepomex.icalialabs.com/api/v1/states
 
 ```json
 {
-  
+
   "states": [
     {
       "id": 1,
@@ -383,9 +392,9 @@ $ rails db:migrate
 5. Next you should populate the database:
 
 ```bash
-$ rails db:seed
+$ rake data:load
 ```
-This operation will take some time, due to the number of records.
+This operation will take some time, due to the number of records. Rake data load will load the data from the csv files into the database, like seed does. Also, it will create the indexes for the database.
 
 6. Close the container
 
@@ -408,7 +417,7 @@ web_1        | The Gemfile's dependencies are satisfied
 web_1        | 2020/08/04 17:40:21 Waiting for: tcp://postgres:5432
 web_1        | 2020/08/04 17:40:21 Connected to tcp://postgres:5432
 web_1        | => Booting Puma
-web_1        | => Rails 6.0.3.2 application starting in development 
+web_1        | => Rails 6.0.3.2 application starting in development
 web_1        | => Run `rails server --help` for more startup options
 web_1        | Puma starting in single mode...
 web_1        | * Version 3.12.6 (ruby 2.7.1-p83), codename: Llamas in Pajamas

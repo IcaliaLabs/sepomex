@@ -1,0 +1,35 @@
+name: Review
+
+on:
+  # Trigger the workflow on activity over any pull request to main:
+  pull_request:
+    branches:
+      - main
+
+# Generate a GitHub token that can be exchanged with Google Cloud - see
+# https://github.com/google-github-actions/auth/tree/v0.6.0#setting-up-workload-identity-federation
+permissions:
+  contents: read
+  id-token: write
+  deployments: write
+
+jobs:
+  test-and-build:
+    name: Integration
+    uses: ./.github/workflows/test-and-build.yml
+    secrets: inherit
+
+  release-to-review:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    name: Delivery
+    uses: ./.github/workflows/deploy-to-cloud-run.yml
+    needs:
+      - test-and-build
+    with:
+      environment: ${{ github.head_ref }}
+      deploy-name: pr${{ github.event.pull_request.number }}
+      cloud-sql-instance: sepomex-365521:us-central1:sepomex
+      cloud-sql-username-secret: database-username:latest
+      cloud-sql-password-secret: database-password:latest
+      cloud-run-service-suffix: ${{ needs.test-and-build.outputs.git-commit-short-sha }}
+      cloud-run-container-image: us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex@${{ needs.test-and-build.outputs.container-image-digest }}

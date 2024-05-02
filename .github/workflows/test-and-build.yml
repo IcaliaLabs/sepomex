@@ -10,13 +10,11 @@ on:
         description: "The Docker image digest which uniquely identifies the built image"
         value: ${{ jobs.test-and-build.outputs.container-image-digest }}
 
-# On this project, I went with a single "Test & Build" job, since each job
-# gets billed rounded to the next minute, and having multiple separated jobs
-# is not worth it at the beginning of the project.
-
-# Keep in mind that, if the test suite becomes too big, and test threading is
-# required, or the workflow speed becomes critial, we might need to revert back
-# to separated jobs.
+# On this project, was some changes to the original workflow, since we are hosting this
+# project on Azure Web Apps, we don't need to deploy to Google Cloud Run, so we removed
+# the deploy-to-staging and deploy-to-production jobs.
+# Instead to deploy, we're just building the image and running the tests. The image will be
+# pushed to the Dockerhub, because it's free and we don't need to pay for it.
 
 jobs:
   test-and-build:
@@ -83,21 +81,15 @@ jobs:
           path: |
             tmp/capybara/screenshots
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v0.8.0
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          service_account: github-actions@sepomex-365521.iam.gserviceaccount.com
-          workload_identity_provider: projects/582875546495/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.6.0
-
-      - name: Authorize push to Google Cloud Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & Push Release Image
         id: build-and-push-release-image
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v5
         with:
           push: true
           target: release
@@ -106,9 +98,10 @@ jobs:
           build-args: |
             DEVELOPER_UID=${{ steps.variables.outputs.runner-uid }}
             DEVELOPER_USERNAME=${{ steps.variables.outputs.runner-user }}
+            DEPLOY_NAME=production
           tags: |
-            us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:${{ steps.variables.outputs.git-commit-short-sha }}
-            us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:${{ steps.variables.outputs.git-dasherized-branch }}
-            us-central1-docker.pkg.dev/sepomex-365521/icalialabs-sepomex/sepomex:latest
+            icalia/sepomex:${{ steps.variables.outputs.git-commit-short-sha }}
+            icalia/sepomex:${{ steps.variables.outputs.git-dasherized-branch }}
+            icalia/sepomex:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

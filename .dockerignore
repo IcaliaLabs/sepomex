@@ -9,7 +9,10 @@ dev-entrypoint.sh
 
 log/*.log
 
-tmp/
+tmp/*
+!tmp/pids/
+!tmp/pids
+!tmp/pids/.keep
 
 .rspec
 spec/

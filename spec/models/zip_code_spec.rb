@@ -39,7 +39,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a valid state gives valid results' do
       state = 'Ciudad de México'
-
+      ZipCode.build_indexes
       expect(ZipCode.find_by_state(state)).to eq([zip_code])
     end
 
@@ -52,7 +52,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a valid city gives valid results' do
       city = 'Ciudad de México'
-
+      ZipCode.build_indexes
       expect(ZipCode.find_by_city(city)).to eq([zip_code])
     end
 
@@ -65,7 +65,7 @@ RSpec.describe ZipCode, type: :model do
 
     it 'search for a valid colony gives valid results' do
       colony = 'San Ángel'
-
+      ZipCode.build_indexes
       expect(ZipCode.find_by_colony(colony)).to eq([zip_code])
     end
   end
