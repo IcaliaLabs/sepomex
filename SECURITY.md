@@ -6,7 +6,7 @@ Please **do not** open a public issue for security problems.
 
 Report vulnerabilities privately via GitHub's
 [Security Advisories](https://github.com/IcaliaLabs/sepomex/security/advisories/new),
-or by email to **opensource@icalialabs.com**. We'll acknowledge your report as
+or by email to **hola@icalialabs.com**. We'll acknowledge your report as
 quickly as we can and keep you updated on the fix.
 
 ## Supported versions

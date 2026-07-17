@@ -303,7 +303,7 @@ lib/sepomex_db.csv                  # bundled dataset (~154k rows)
 
 ## 🔁 How it ships
 
-Pushing to `main` runs the GitHub Actions pipeline (`.github/workflows`): it builds the Docker `testing` image, runs the spec suite, then builds and pushes the `release` image to **Docker Hub** (`icalia/sepomex`). The production image bakes the SQLite catalog at build time; hosting runs on **Azure Web Apps**.
+Pushing to `main` runs the GitHub Actions pipeline (`.github/workflows`): it builds the Docker `testing` image, runs the spec suite, then builds and pushes the `release` image to **Docker Hub** (`icalia/sepomex`). The production image bakes the SQLite catalog at build time and can be deployed to any container host; set a `SECRET_KEY_BASE` in that environment (it isn't baked into the image).
 
 ## 🗺️ Roadmap
 
