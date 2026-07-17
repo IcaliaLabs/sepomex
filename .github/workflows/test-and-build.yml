@@ -73,11 +73,12 @@ jobs:
         run: docker compose run --rm tests
 
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: system-spec-screenshots
           retention-days: 7
+          if-no-files-found: ignore
           path: |
             tmp/capybara/screenshots
 
