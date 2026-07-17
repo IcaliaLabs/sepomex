@@ -19,8 +19,11 @@ AllCops:
   TargetRubyVersion: 3.4
   TargetRailsVersion: '8.1'
   SuggestExtensions: false
-  # Include common Ruby source files
+  # Include Ruby source files (plus the default extras). Without the explicit
+  # '**/*.rb' the previous list *replaced* RuboCop's default, so no .rb file was
+  # ever inspected — which also broke `--force-exclusion` in CI.
   Include:
+    - '**/*.rb'
     - '**/*.gemspec'
     - '**/Gemfile'
     - '**/Rakefile'
@@ -35,6 +38,10 @@ AllCops:
 # Pragmatic thresholds for this small API-only app:
 Metrics/AbcSize:
   Max: 25
+
+# Don't require a doc comment on every class (Rails-omakase convention).
+Style/Documentation:
+  Enabled: false
 
 Metrics/MethodLength:
   Max: 15

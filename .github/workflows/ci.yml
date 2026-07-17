@@ -75,5 +75,7 @@ jobs:
             echo "No Ruby files changed — nothing to lint."
           else
             echo "Linting changed files: $files"
-            bundle exec rubocop --format github $files
+            # --force-exclusion honors AllCops/Exclude (config, db, bin, …) even
+            # for explicitly-listed files.
+            bundle exec rubocop --force-exclusion --format github $files
           fi
