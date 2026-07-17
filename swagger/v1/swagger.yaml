@@ -1,0 +1,565 @@
+---
+openapi: 3.0.1
+info:
+  title: Sepomex API
+  version: v1
+  description: |
+    Open REST API for Mexico's postal-code (código postal) catalog — zip
+    codes (settlements), states, municipalities and cities. Read-only,
+    public, no API key. Paginated with 15 items per page (max 200).
+  license:
+    name: MIT
+    url: https://github.com/IcaliaLabs/sepomex/blob/main/LICENSE
+servers:
+- url: http://localhost:3000
+  description: Local
+paths:
+  "/api/v1/cities":
+    get:
+      summary: List cities
+      tags:
+      - Cities
+      parameters:
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: paginated cities
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CityList"
+  "/api/v1/cities/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a city
+      tags:
+      - Cities
+      responses:
+        '200':
+          description: a city
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  city:
+                    "$ref": "#/components/schemas/City"
+        '404':
+          description: city not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/municipalities":
+    get:
+      summary: List municipalities
+      tags:
+      - Municipalities
+      parameters:
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: paginated municipalities
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MunicipalityList"
+  "/api/v1/municipalities/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a municipality
+      tags:
+      - Municipalities
+      responses:
+        '200':
+          description: a municipality
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  municipality:
+                    "$ref": "#/components/schemas/Municipality"
+        '404':
+          description: municipality not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/states":
+    get:
+      summary: List states
+      tags:
+      - States
+      parameters:
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: paginated states
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/StateList"
+  "/api/v1/states/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a state
+      tags:
+      - States
+      responses:
+        '200':
+          description: a state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  state:
+                    "$ref": "#/components/schemas/State"
+        '404':
+          description: state not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/states/{id}/municipalities":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: A state's municipalities
+      tags:
+      - States
+      responses:
+        '200':
+          description: municipalities of the state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  municipalities:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/Municipality"
+  "/api/v1/zip_codes":
+    get:
+      summary: Search zip codes
+      tags:
+      - Zip Codes
+      description: Search settlements (colonias) by any combination of zip_code, state,
+        city/municipality and colony. All filters are partial and accent-insensitive.
+      parameters:
+      - name: zip_code
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Postal code, full or partial (e.g. "64000")
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: city
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: colony
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Items per page (default 15, max 200)
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: matching settlements
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ZipCodeList"
+components:
+  schemas:
+    ZipCode:
+      type: object
+      properties:
+        id:
+          type: integer
+        d_codigo:
+          type: string
+          example: '01000'
+        d_asenta:
+          type: string
+          example: San Ángel
+        d_tipo_asenta:
+          type: string
+          example: Colonia
+        d_mnpio:
+          type: string
+          example: Álvaro Obregón
+        d_estado:
+          type: string
+          example: Ciudad de México
+        d_ciudad:
+          type: string
+          nullable: true
+        d_cp:
+          type: string
+          example: '01001'
+        c_estado:
+          type: string
+          example: '09'
+        c_oficina:
+          type: string
+        c_cp:
+          type: string
+          nullable: true
+        c_tipo_asenta:
+          type: string
+        c_mnpio:
+          type: string
+        id_asenta_cpcons:
+          type: string
+        d_zona:
+          type: string
+          example: Urbano
+        c_cve_ciudad:
+          type: string
+          nullable: true
+    State:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Ciudad de México
+        cities_count:
+          type: integer
+          example: 16
+    Municipality:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Álvaro Obregón
+        municipality_key:
+          type: string
+          example: '010'
+        zip_code:
+          type: string
+          example: '01001'
+        state_id:
+          type: integer
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Ciudad de México
+        state_id:
+          type: integer
+    PaginationMeta:
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            per_page:
+              type: integer
+              example: 15
+            total_pages:
+              type: integer
+              example: 9728
+            total_objects:
+              type: integer
+              example: 145906
+            links:
+              type: object
+              properties:
+                first:
+                  type: string
+                last:
+                  type: string
+                prev:
+                  type: string
+                next:
+                  type: string
+    ZipCodeList:
+      type: object
+      properties:
+        zip_codes:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              d_codigo:
+                type: string
+                example: '01000'
+              d_asenta:
+                type: string
+                example: San Ángel
+              d_tipo_asenta:
+                type: string
+                example: Colonia
+              d_mnpio:
+                type: string
+                example: Álvaro Obregón
+              d_estado:
+                type: string
+                example: Ciudad de México
+              d_ciudad:
+                type: string
+                nullable: true
+              d_cp:
+                type: string
+                example: '01001'
+              c_estado:
+                type: string
+                example: '09'
+              c_oficina:
+                type: string
+              c_cp:
+                type: string
+                nullable: true
+              c_tipo_asenta:
+                type: string
+              c_mnpio:
+                type: string
+              id_asenta_cpcons:
+                type: string
+              d_zona:
+                type: string
+                example: Urbano
+              c_cve_ciudad:
+                type: string
+                nullable: true
+        meta:
+          type: object
+          properties:
+            pagination:
+              type: object
+              properties:
+                per_page:
+                  type: integer
+                  example: 15
+                total_pages:
+                  type: integer
+                  example: 9728
+                total_objects:
+                  type: integer
+                  example: 145906
+                links:
+                  type: object
+                  properties:
+                    first:
+                      type: string
+                    last:
+                      type: string
+                    prev:
+                      type: string
+                    next:
+                      type: string
+    StateList:
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+                example: Ciudad de México
+              cities_count:
+                type: integer
+                example: 16
+        meta:
+          type: object
+          properties:
+            pagination:
+              type: object
+              properties:
+                per_page:
+                  type: integer
+                  example: 15
+                total_pages:
+                  type: integer
+                  example: 9728
+                total_objects:
+                  type: integer
+                  example: 145906
+                links:
+                  type: object
+                  properties:
+                    first:
+                      type: string
+                    last:
+                      type: string
+                    prev:
+                      type: string
+                    next:
+                      type: string
+    MunicipalityList:
+      type: object
+      properties:
+        municipalities:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+                example: Álvaro Obregón
+              municipality_key:
+                type: string
+                example: '010'
+              zip_code:
+                type: string
+                example: '01001'
+              state_id:
+                type: integer
+        meta:
+          type: object
+          properties:
+            pagination:
+              type: object
+              properties:
+                per_page:
+                  type: integer
+                  example: 15
+                total_pages:
+                  type: integer
+                  example: 9728
+                total_objects:
+                  type: integer
+                  example: 145906
+                links:
+                  type: object
+                  properties:
+                    first:
+                      type: string
+                    last:
+                      type: string
+                    prev:
+                      type: string
+                    next:
+                      type: string
+    CityList:
+      type: object
+      properties:
+        cities:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+                example: Ciudad de México
+              state_id:
+                type: integer
+        meta:
+          type: object
+          properties:
+            pagination:
+              type: object
+              properties:
+                per_page:
+                  type: integer
+                  example: 15
+                total_pages:
+                  type: integer
+                  example: 9728
+                total_objects:
+                  type: integer
+                  example: 145906
+                links:
+                  type: object
+                  properties:
+                    first:
+                      type: string
+                    last:
+                      type: string
+                    prev:
+                      type: string
+                    next:
+                      type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Not Found
+        message:
+          type: string
+        status:
+          type: integer
+          example: 404
