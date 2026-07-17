@@ -94,7 +94,6 @@ RSpec.configure do |config|
         license: { name: 'MIT', url: 'https://github.com/IcaliaLabs/sepomex/blob/main/LICENSE' }
       },
       servers: [
-        { url: 'https://sepomex.icalialabs.com', description: 'Production' },
         { url: 'http://localhost:3000', description: 'Local' }
       ],
       paths: {},
