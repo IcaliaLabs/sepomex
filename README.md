@@ -8,6 +8,7 @@
 
 [![Release](https://img.shields.io/github/v/release/IcaliaLabs/sepomex?color=c2693d&label=release)](https://github.com/IcaliaLabs/sepomex/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/IcaliaLabs/sepomex/ci-and-cd.yml?branch=main&color=c2693d&label=build)](https://github.com/IcaliaLabs/sepomex/actions)
+[![codecov](https://codecov.io/gh/IcaliaLabs/sepomex/branch/main/graph/badge.svg)](https://codecov.io/gh/IcaliaLabs/sepomex)
 [![Ruby](https://img.shields.io/badge/Ruby-3.4.7-c2693d)](.ruby-version)
 [![Rails](https://img.shields.io/badge/Rails-8.1-c2693d)](Gemfile)
 [![MCP](https://img.shields.io/badge/MCP-ready-c2693d)](#-mcp-server)

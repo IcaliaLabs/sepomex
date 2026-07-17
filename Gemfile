@@ -69,4 +69,8 @@ group :test do
   gem 'rspec-rails', '>= 7.1'
   gem 'rswag-specs', '~> 2.13'
   gem 'shoulda-matchers', '~> 6.0'
+
+  # Test coverage (+ lcov report for the Codecov upload / badge)
+  gem 'simplecov', '~> 0.22', require: false
+  gem 'simplecov-lcov', '~> 0.8', require: false
 end
