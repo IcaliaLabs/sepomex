@@ -14,6 +14,28 @@ read-only JSON REST API under `/api/v1` and a **Model Context Protocol** server 
 **Stack:** Ruby 3.4.7 · Rails 8.1 (`config.api_only`) · SQLite (`sqlite3` 2.x) ·
 Puma · Active Model Serializers (`:json` adapter) · `mcp` gem.
 
+## Building features & fixing bugs
+
+Use **[roundhouse](https://github.com/kurenn/roundhouse)** — a Claude Code plugin
+that runs a Rails specialist team (an Opus orchestrator that triages and dispatches
+Sonnet specialists) — for implementation work, instead of ad-hoc edits:
+
+- **Features** → `/rails-feature <what you want>` — triages the task and dispatches
+  specialists, working **test-first** with conditional security/database gates.
+- **Bugs** → `/rails-bugfix <symptom or failing spec>` — root-cause first:
+  reproduce, trace, hypothesize, verify, then fix.
+- **Targeted work** → call a specialist directly: `/rails-models`,
+  `/rails-controllers`, `/rails-services`, `/rails-tests`, `/rails-jobs`. (`/rails-views`
+  and `/rails-tailwind` rarely apply — this is an API-only app with no HTML views.)
+
+Whichever path you take, follow the conventions and gotchas below, keep the public
+REST contract stable, and leave the spec suite green. When adding an MCP-facing
+capability, expose it as a tool under `app/mcp/` that reuses the same models the
+REST controllers use.
+
+Install once: `claude plugin marketplace add kurenn/marketplace` then
+`claude plugin install roundhouse@kurenn`.
+
 ## Commands
 
 ```bash
