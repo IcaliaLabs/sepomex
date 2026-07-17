@@ -40,6 +40,10 @@ group :development, :test do
 end
 
 group :development do
+  # Security scanners (also run in CI):
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
+
   # Ruby code linters:
   gem 'reek', '~> 6.3', require: false
 

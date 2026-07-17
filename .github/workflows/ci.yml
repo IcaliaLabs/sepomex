@@ -1,0 +1,79 @@
+name: CI
+
+# Runs the test suite, security analysis and lint on every pull request and on
+# pushes to main. This is separate from `ci-and-cd.yml`, which builds and ships
+# the Docker images.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref (e.g. rapid pushes to a PR).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests (RSpec)
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true # installs gems (from .ruby-version) and caches them
+
+      - name: Prepare the test database
+        run: bin/rails db:test:prepare
+
+      - name: Run specs
+        run: bundle exec rspec
+
+  security:
+    name: Security (Brakeman + bundler-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Brakeman (static app security analysis)
+        run: bundle exec brakeman --no-pager --exit-on-warn --exit-on-error
+
+      - name: bundler-audit (known gem vulnerabilities)
+        run: bundle exec bundle-audit check --update
+
+  lint:
+    name: Lint (RuboCop)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need history to diff changed files
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: RuboCop on changed Ruby files
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          files=$(git diff --name-only --diff-filter=ACMR "$base"...HEAD -- '*.rb' | tr '\n' ' ')
+          if [ -z "$(echo "$files" | tr -d '[:space:]')" ]; then
+            echo "No Ruby files changed — nothing to lint."
+          else
+            echo "Linting changed files: $files"
+            bundle exec rubocop --format github $files
+          fi

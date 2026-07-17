@@ -44,6 +44,14 @@ Metrics/BlockLength:
     - 'lib/tasks/**/*'
     - 'spec/**/*'
 
+# These are custom named scopes on ZipCode, not dynamic finders.
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_zip_code
+    - find_by_state
+    - find_by_city
+    - find_by_colony
+
 RSpec/MultipleExpectations:
   Max: 5
 
