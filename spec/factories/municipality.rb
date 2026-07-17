@@ -3,8 +3,8 @@
 FactoryBot.define do
   factory :municipality do
     name { 'Álvaro Obregón' }
-    municipality_key { '09' }
+    sequence(:municipality_key) { |n| format('%03d', n) }
     zip_code { '01000' }
-    state_id { 123 }
+    association :state
   end
 end

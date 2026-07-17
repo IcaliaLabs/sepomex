@@ -1,5 +1,4 @@
 volumes:
-  postgres_data:
   vscode_extensions:
   vscode_insiders_extensions:
 
@@ -21,7 +20,7 @@ services:
       - .:/workspaces/sepomex
 
     # Keep the stdin open, so we can attach to our app container's process
-    # and do things such as byebug, etc:
+    # and do things such as running the debugger, etc:
     stdin_open: true
 
     # Enable sending signals (CTRL+C, CTRL+P + CTRL+Q) into the container:

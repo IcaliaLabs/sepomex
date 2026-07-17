@@ -46,7 +46,7 @@ class LoadCsvToDatabase
     end
 
     def zip_codes_import_cte
-      current_time_cast = "CAST('#{Time.current.utc.to_s(:db)}' AS TIMESTAMP)"
+      current_time_cast = "CAST('#{Time.current.utc.to_fs(:db)}' AS TIMESTAMP)"
       <<~SQL.squish
         WITH "updates" AS (
           SELECT

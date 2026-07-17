@@ -3,6 +3,7 @@
 FactoryBot.define do
   factory :city do
     name { 'Monterrey' }
-    state_id { 30 }
+    association :state
+    sequence(:sepomex_city_code) { |n| n }
   end
 end

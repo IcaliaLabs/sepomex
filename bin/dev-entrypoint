@@ -1,21 +1,40 @@
 #!/usr/bin/env ruby
-
 # frozen_string_literal: true
 
-require 'on_container/dev/rails'
+# Development / test container entrypoint.
+#
+# Prepares the environment (gems + database) and then execs the given command,
+# defaulting to the Rails server. Runs on `docker compose up` (development) and
+# `docker compose run --rm tests` (CI).
 
-set_given_or_default_command
+require 'fileutils'
 
-if command_requires_setup?
-  on_setup_lock_acquired do
-    ensure_project_gems_are_installed
+APP_ROOT = File.expand_path('..', __dir__)
+Dir.chdir(APP_ROOT)
 
-    setup_activerecord_database if command_might_require_database? && !activerecord_database_ready?
+# Default to booting the Rails server when no command is given:
+ARGV.concat(%w[rails server -b 0.0.0.0]) if ARGV.empty?
 
-    system 'rails db:test:prepare' if %w[rspec].include?(ARGV[0])
+def run(command)
+  system(command) || abort("\n== Command failed, exiting: #{command} ==")
+end
 
-    remove_rails_pidfile if rails_server?
+# Ensure the project gems are installed:
+run 'bundle check > /dev/null 2>&1 || bundle install'
+
+command = ARGV.first
+
+if %w[rails rake rspec puma].include?(command)
+  # Create + migrate the database if it isn't ready yet (idempotent):
+  run 'bundle exec rails db:prepare'
+
+  # Prepare the test database before running the suite:
+  run 'bundle exec rails db:test:prepare' if command == 'rspec'
+
+  # Remove a possibly pre-existing server.pid before booting the server:
+  if command == 'rails' && ARGV[1].to_s.start_with?('s')
+    FileUtils.rm_f(File.join(APP_ROOT, 'tmp', 'pids', 'server.pid'))
   end
 end
 
-execute_given_or_default_command
+exec(*ARGV)

@@ -4,7 +4,7 @@ class Municipality < ApplicationRecord
   belongs_to :state
 
   scope :find_by_zip_code, lambda { |cp|
-    where('zip_code ILIKE ?', "%#{cp}%")
+    where('zip_code LIKE ?', "%#{cp}%")
   }
 
   def self.search(params = {})
