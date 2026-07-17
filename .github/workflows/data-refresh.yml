@@ -1,0 +1,67 @@
+name: Refresh dataset
+
+# Regenerates lib/sepomex_db.csv from the latest official SEPOMEX XML export and
+# opens a PR when the data changes.
+#
+# The official export (CodigoPostal_Exportar.aspx) is behind a web form, so it
+# has no stable direct-download URL. Provide the URL of a `CPdescarga.xml` via
+# the workflow_dispatch input or a `SEPOMEX_XML_URL` repository variable; the
+# scheduled run is a no-op when neither is set.
+on:
+  workflow_dispatch:
+    inputs:
+      xml_url:
+        description: URL to a SEPOMEX CPdescarga.xml export
+        required: false
+  schedule:
+    - cron: "0 6 1 * *" # 06:00 UTC on the 1st of each month
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    name: Refresh dataset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Resolve the XML source
+        id: src
+        run: |
+          url="${{ github.event.inputs.xml_url }}"
+          [ -z "$url" ] && url="${{ vars.SEPOMEX_XML_URL }}"
+          if [ -z "$url" ]; then
+            echo "No xml_url input or SEPOMEX_XML_URL variable set — nothing to do."
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Download the SEPOMEX XML
+        if: steps.src.outputs.url != ''
+        run: curl -fSL "${{ steps.src.outputs.url }}" -o "${RUNNER_TEMP}/CPdescarga.xml"
+
+      - name: Regenerate lib/sepomex_db.csv
+        if: steps.src.outputs.url != ''
+        run: bundle exec rake "data:import_xml[${RUNNER_TEMP}/CPdescarga.xml]"
+
+      - name: Open a PR if the dataset changed
+        if: steps.src.outputs.url != ''
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/refresh-dataset
+          add-paths: lib/sepomex_db.csv
+          commit-message: Refresh lib/sepomex_db.csv from the latest SEPOMEX export
+          title: Refresh postal-code dataset
+          labels: data
+          body: |
+            Automated refresh of `lib/sepomex_db.csv` from the latest official
+            SEPOMEX XML export.
+
+            After merging, the next release image bakes in the new data; to update
+            a running/local database, run `bin/rails db:reset && rake data:loadev`.

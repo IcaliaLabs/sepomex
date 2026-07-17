@@ -1,6 +1,10 @@
 .git/
 .gitignore
 
+# Never bake the credentials master key into the image — production reads
+# SECRET_KEY_BASE (or RAILS_MASTER_KEY) from the environment.
+config/master.key
+
 Dockerfile
 docker-compose.yml
 *.env

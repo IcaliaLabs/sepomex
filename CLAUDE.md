@@ -49,9 +49,11 @@ bin/mcp                       # MCP server over stdio (RAILS_ENV=development by 
 ```
 
 CI (`.github/workflows`) builds the Dockerfile `testing` + `release` targets and
-runs `docker compose run --rm tests`, pushing images to Docker Hub. Hosting is on
-Azure Web Apps. The Ruby version is set **only** in the `Dockerfile` and
-`.ruby-version`, not in workflow YAML.
+runs `docker compose run --rm tests`, pushing the release image to Docker Hub
+(`icalia/sepomex`) to be deployed to any container host. Production reads
+`SECRET_KEY_BASE` from the environment (not baked into the image). The Ruby
+version is set **only** in the `Dockerfile` and `.ruby-version`, not in workflow
+YAML.
 
 ## Architecture
 
