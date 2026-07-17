@@ -1,0 +1,28 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f25e9e50e5eb9bb1ac9a04cccb1f51d474c57d5727b342deb90ad0d72438faee",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/zip_code.rb",
+      "line": 93,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "self.connection.execute(\"INSERT INTO fts_zip_codes (#{ZipCode::FTS_COLUMNS.join(\", \")}, zip_code_id)\\nVALUES #{all.in_batches(of: 5000).map { |batch| batch.map { |item| fts_row_values(item) } }.join(\", \")}\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ZipCode",
+        "method": "build_indexes"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Reviewed & safe: FTS5 virtual tables can't use insert_all, so this bulk INSERT is unavoidable. The only interpolated values are the fixed FTS_COLUMNS constant, integer ids (to_i), and column values passed through connection.quote in fts_row_values — no user input reaches the query."
+    }
+  ],
+  "brakeman_version": "8.0.5"
+}

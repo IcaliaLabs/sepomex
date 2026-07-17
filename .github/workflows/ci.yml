@@ -28,7 +28,9 @@ jobs:
           bundler-cache: true # installs gems (from .ruby-version) and caches them
 
       - name: Prepare the test database
-        run: bin/rails db:test:prepare
+        # db:prepare (not db:test:prepare) — with the SQL schema format it
+        # creates the DB, loads db/structure.sql and sets the environment marker.
+        run: bin/rails db:prepare
 
       - name: Run specs
         run: bundle exec rspec

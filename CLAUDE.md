@@ -88,8 +88,11 @@ Azure Web Apps. The Ruby version is set **only** in the `Dockerfile` and
 
 - **SQLite only.** No PostgreSQL. Avoid Postgres-isms (`ILIKE`, `unaccent`,
   extensions). Case-insensitive search uses `lower(...) LIKE` / `alpharize`.
-- `db/schema.rb` is the schema source of truth (`schema_format` is the default
-  `:ruby`). `db/structure.sql` also exists but is not used by `db:schema:load`.
+- **`db/structure.sql` is the schema source of truth** (`schema_format = :sql`),
+  because `fts_zip_codes` is a SQLite **FTS5** virtual table that `schema.rb`
+  can't represent. Prepare databases with `db:prepare` (not `db:test:prepare`,
+  which trips the environment check on a SQL schema). Search uses FTS5 `MATCH`
+  (token/prefix, accent-folded via the `remove_diacritics` tokenizer).
 - `rake data:load` is gated to `Rails.env.production? && ENV['DEPLOY_NAME']=='production'`;
   use `data:loadev` in development/CI.
 - `bin/mcp` must keep `$stdout` clean for JSON-RPC — Rails logs go to `$stderr`.

@@ -36,6 +36,10 @@ module Sepomex
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    # The zip-code search uses a SQLite FTS5 virtual table, which schema.rb can't
+    # represent — so the schema is managed as SQL (db/structure.sql).
+    config.active_record.schema_format = :sql
+
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins '*'
