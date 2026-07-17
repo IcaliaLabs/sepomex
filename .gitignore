@@ -58,3 +58,4 @@ db/dumps/*
 /tmp/pids/*
 !/tmp/pids/
 !/tmp/pids/.keep
+/coverage
