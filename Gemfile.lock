@@ -87,7 +87,12 @@ GEM
     bigdecimal (4.1.2)
     bootsnap (1.24.6)
       msgpack (~> 1.2)
+    brakeman (8.0.5)
+      racc
     builder (3.3.0)
+    bundler-audit (0.9.3)
+      bundler (>= 1.2.0)
+      thor (~> 1.0)
     case_transform (0.2)
       activesupport
     commander (5.0.0)
@@ -436,6 +441,8 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers (~> 0.10.14)
   bootsnap (>= 1.18)
+  brakeman
+  bundler-audit
   csv (~> 3.3)
   debug
   factory_bot_rails (~> 6.4)
