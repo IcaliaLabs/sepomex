@@ -24,7 +24,7 @@ gem 'csv', '~> 3.3'
 gem 'active_model_serializers', '~> 0.10.14'
 
 # Rack CORS for handling Cross-Origin Resource Sharing (cross-origin AJAX)
-gem 'rack-cors', '~> 2.0'
+gem 'rack-cors', '~> 3.0'
 
 # Throttling / abuse protection for the public API
 gem 'rack-attack', '~> 6.7'
