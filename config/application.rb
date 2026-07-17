@@ -42,5 +42,8 @@ module Sepomex
         resource '*', headers: :any, methods: %i[get]
       end
     end
+
+    # Throttle abusive clients (configured in config/initializers/rack_attack.rb).
+    config.middleware.use Rack::Attack
   end
 end
