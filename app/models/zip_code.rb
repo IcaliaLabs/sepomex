@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# A settlement (colonia) row from the SEPOMEX catalog — the core searchable
+# record. `ZipCode.search` powers both the REST endpoint and the MCP tool, and
+# `build_indexes` maintains the fts_zip_codes helper table used by the search
+# scopes.
 class ZipCode < ApplicationRecord
   has_one :fts_zip_code, dependent: :destroy
   validates :d_codigo, presence: true
@@ -77,22 +81,24 @@ class ZipCode < ApplicationRecord
     )
   end
 
+  FTS_COLUMNS = %w[d_ciudad d_estado d_asenta d_mnpio].freeze
+
+  # Rebuilds the full-text helper table (fts_zip_codes) from every zip code,
+  # storing the accent-/case-normalized values the search scopes match against.
+  # Uses insert_all in batches to stay within SQLite's bound-parameter limit.
   def self.build_indexes
-    values = all.map { |item| build_index(item) }
-    sql = <<~SQL.strip
-      INSERT INTO fts_zip_codes (zip_code_id, d_ciudad, d_estado, d_asenta, d_mnpio)
-      VALUES #{values.join(',')}
-    SQL
-    connection.execute sql
+    all.in_batches(of: 5_000) do |batch|
+      rows = batch.map do |item|
+        { zip_code_id: item.id }.merge(
+          FTS_COLUMNS.index_with { |column| alpharize(item[column].to_s) }
+        )
+      end
+      # fts_zip_codes is a denormalized search index with no validations.
+      FtsZipCode.insert_all(rows) # rubocop:disable Rails/SkipsModelValidations
+    end
   end
 
   def self.alpharize(text)
     text.downcase.parameterize(separator: ' ')
-  end
-
-  def self.build_index(item)
-    "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta', 'd_mnpio').transform_values do |v|
-      ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v
-    end.values.join(',')})"
   end
 end
