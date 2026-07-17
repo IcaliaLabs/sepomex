@@ -15,16 +15,15 @@ class ZipCode < ApplicationRecord
   }
 
   scope :find_by_state, lambda { |state|
-    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_estado LIKE ?', "%#{alpharize(state)}%")
+    fts_search('d_estado', state)
   }
 
   scope :find_by_city, lambda { |city|
-    city = "%#{alpharize(city)}%"
-    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_ciudad LIKE ? OR fts_zip_codes.d_mnpio LIKE ?', city, city)
+    fts_search(%w[d_ciudad d_mnpio], city)
   }
 
   scope :find_by_colony, lambda { |colony|
-    distinct.joins(:fts_zip_code).where('fts_zip_codes.d_asenta LIKE ?', "%#{alpharize(colony)}%")
+    fts_search('d_asenta', colony)
   }
 
   def self.search(params = {})
@@ -34,11 +33,10 @@ class ZipCode < ApplicationRecord
       zip_codes = zip_codes.find_by_zip_code(params['cp'] || params['zip_code'])
     end
 
-    zip_codes = zip_codes.find_by_state(params['state']) if params[:state].present?
-
-    zip_codes = zip_codes.find_by_city(params['city']) if params['city'].present?
-
-    zip_codes = zip_codes.find_by_colony(params['colony']) if params[:colony].present?
+    # FTS5 allows a single MATCH per query, so the state/city/colony filters are
+    # combined into one boolean MATCH expression rather than chained scopes.
+    fts = fts_conditions(params)
+    zip_codes = zip_codes.joins(:fts_zip_code).where('fts_zip_codes MATCH ?', fts) if fts
 
     zip_codes
   end
@@ -83,19 +81,49 @@ class ZipCode < ApplicationRecord
 
   FTS_COLUMNS = %w[d_ciudad d_estado d_asenta d_mnpio].freeze
 
-  # Rebuilds the full-text helper table (fts_zip_codes) from every zip code,
-  # storing the accent-/case-normalized values the search scopes match against.
-  # Uses insert_all in batches to stay within SQLite's bound-parameter limit.
+  # Rebuilds the fts_zip_codes FTS5 index from every zip code. Raw values are
+  # stored — the `remove_diacritics` tokenizer folds case and accents itself.
+  # FTS5 virtual tables can't use insert_all (no unique index), so rows are bulk
+  # INSERTed in batches; every value goes through connection.quote (safe).
   def self.build_indexes
     all.in_batches(of: 5_000) do |batch|
-      rows = batch.map do |item|
-        { zip_code_id: item.id }.merge(
-          FTS_COLUMNS.index_with { |column| alpharize(item[column].to_s) }
-        )
-      end
-      # fts_zip_codes is a denormalized search index with no validations.
-      FtsZipCode.insert_all(rows) # rubocop:disable Rails/SkipsModelValidations
+      values = batch.map { |item| fts_row_values(item) }
+      connection.execute(<<~SQL.squish)
+        INSERT INTO fts_zip_codes (#{FTS_COLUMNS.join(', ')}, zip_code_id)
+        VALUES #{values.join(', ')}
+      SQL
     end
+  end
+
+  def self.fts_row_values(item)
+    quoted = FTS_COLUMNS.map { |column| connection.quote(item[column].to_s) }
+    "(#{quoted.join(', ')}, #{item.id.to_i})"
+  end
+
+  # Relation matching the FTS5 index for one column (or set of columns).
+  def self.fts_search(columns, value)
+    query = fts_column_query(columns, value)
+    query ? joins(:fts_zip_code).where('fts_zip_codes MATCH ?', query) : none
+  end
+
+  # Combines the state/city/colony filters into a single boolean FTS5 MATCH
+  # expression (nil when none are present).
+  def self.fts_conditions(params)
+    [
+      (fts_column_query('d_estado', params['state']) if params[:state].present?),
+      (fts_column_query(%w[d_ciudad d_mnpio], params['city']) if params['city'].present?),
+      (fts_column_query('d_asenta', params['colony']) if params[:colony].present?)
+    ].compact.join(' AND ').presence
+  end
+
+  # Turns user input into a safe, column-scoped FTS5 prefix query — e.g.
+  # ("Monterrey", %w[d_ciudad d_mnpio]) => "{d_ciudad d_mnpio} : (monterrey*)".
+  # Only alphanumeric tokens survive, so the MATCH expression can't be injected.
+  def self.fts_column_query(columns, value)
+    tokens = value.to_s.scan(/[[:alnum:]]+/)
+    return if tokens.empty?
+
+    "{#{Array(columns).join(' ')}} : (#{tokens.map { |token| "#{token}*" }.join(' ')})"
   end
 
   def self.alpharize(text)
