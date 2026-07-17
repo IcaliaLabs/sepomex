@@ -37,7 +37,7 @@ jobs:
 
       - name: Set additional variables
         id: variables
-        uses: icalia-actions/common-variables@v0.0.3
+        uses: icalia-actions/common-variables@v0.0.5
 
       - name: Set build timestamp
         id: set-build-timestamp
