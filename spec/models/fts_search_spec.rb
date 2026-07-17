@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 # Behavioural coverage for the SQLite FTS5 zip-code search.
-RSpec.describe 'ZipCode FTS5 search' do
+RSpec.describe 'ZipCode FTS5 search' do # rubocop:disable RSpec/DescribeClass
   it 'matches accent- and case-insensitively' do
     FactoryBot.create(:zip_code, d_estado: 'Nuevo León', d_mnpio: 'Monterrey',
                                  d_ciudad: 'Monterrey', d_asenta: 'Centro')
