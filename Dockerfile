@@ -14,6 +14,8 @@ RUN apt-get update \
     ca-certificates \
     curl \
     libsqlite3-0 \
+    # The sqlite3 CLI is required to load/dump db/structure.sql (schema_format :sql):
+    sqlite3 \
     openssl \
     # Required by mimemagic gem:
     shared-mime-info \
