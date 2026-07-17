@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v4
 
       - # We'll generate a unique id that we'll use to identify the build run
         # on our systems
@@ -45,13 +45,11 @@ jobs:
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2.2.1
-        with:
-          version: v0.9.1
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Test Image
         id: build-test-image
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v6
         with:
           load: true
           target: testing
@@ -90,7 +88,7 @@ jobs:
 
       - name: Build & Push Release Image
         id: build-and-push-release-image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           target: release
