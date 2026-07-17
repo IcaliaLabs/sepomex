@@ -35,20 +35,21 @@ The whole catalog (~154k settlements) ships **inside the app as a SQLite databas
 - 🌐 **CORS-friendly & read-only** — safe to call straight from the browser.
 - 🐳 **Dockerized** — multi-stage build, one-command dev environment, CI that ships images to Docker Hub.
 
-> **No key, no quota, no tracking.** Sepomex is a read-only public API over public data. Run the hosted instance or host your own in minutes — the dataset travels with the code.
+> **No key, no quota, no tracking.** Sepomex is a read-only public API over public data. Host your own in minutes — the dataset travels with the code.
 
 ## 🚀 Quick start
 
-The base URI for the hosted JSON API:
+All endpoints live under the `/api/v1` path — prefix it with your host (the
+examples below use a local `http://localhost:3000`):
 
 ```bash
-https://sepomex.icalialabs.com/api/v1
+/api/v1
 ```
 
 Grab every settlement for a postal code:
 
 ```bash
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?zip_code=64000"
+curl "http://localhost:3000/api/v1/zip_codes?zip_code=64000"
 ```
 
 ```json
@@ -91,19 +92,19 @@ Mix and match any of the search parameters — matching is partial and accent-in
 
 ```bash
 # by postal code
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?zip_code=67173"
+curl "http://localhost:3000/api/v1/zip_codes?zip_code=67173"
 
 # by city / municipality
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?city=monterrey"
+curl "http://localhost:3000/api/v1/zip_codes?city=monterrey"
 
 # by state
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?state=nuevo%20leon"
+curl "http://localhost:3000/api/v1/zip_codes?state=nuevo%20leon"
 
 # by colony (settlement)
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?colony=del%20valle"
+curl "http://localhost:3000/api/v1/zip_codes?colony=del%20valle"
 
 # all together
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?state=nuevo%20leon&city=guadalupe&colony=del%20valle"
+curl "http://localhost:3000/api/v1/zip_codes?state=nuevo%20leon&city=guadalupe&colony=del%20valle"
 ```
 
 <details>
@@ -151,11 +152,11 @@ curl "https://sepomex.icalialabs.com/api/v1/zip_codes?state=nuevo%20leon&city=gu
 ### States, municipalities & cities
 
 ```bash
-curl "https://sepomex.icalialabs.com/api/v1/states"
-curl "https://sepomex.icalialabs.com/api/v1/states/1"
-curl "https://sepomex.icalialabs.com/api/v1/states/1/municipalities"
-curl "https://sepomex.icalialabs.com/api/v1/municipalities/1"
-curl "https://sepomex.icalialabs.com/api/v1/cities/1"
+curl "http://localhost:3000/api/v1/states"
+curl "http://localhost:3000/api/v1/states/1"
+curl "http://localhost:3000/api/v1/states/1/municipalities"
+curl "http://localhost:3000/api/v1/municipalities/1"
+curl "http://localhost:3000/api/v1/cities/1"
 ```
 
 <details>
@@ -181,7 +182,7 @@ curl "https://sepomex.icalialabs.com/api/v1/cities/1"
 Every `index` response is paginated — **15 per page** by default, up to **200** via `per_page` (larger values fall back to 15). Combine `per_page` with `page`:
 
 ```bash
-curl "https://sepomex.icalialabs.com/api/v1/zip_codes?per_page=200&page=2"
+curl "http://localhost:3000/api/v1/zip_codes?per_page=200&page=2"
 ```
 
 Each response includes a `meta.pagination` block:
