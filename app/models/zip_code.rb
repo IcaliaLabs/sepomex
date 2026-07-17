@@ -90,10 +90,6 @@ class ZipCode < ApplicationRecord
     text.downcase.parameterize(separator: ' ')
   end
 
-  def self.unaccent(column_name, value)
-    where("lower(unaccent(#{column_name})) LIKE lower(unaccent(?))", "%#{value}%")
-  end
-
   def self.build_index(item)
     "(#{item.attributes.slice('id', 'd_ciudad', 'd_estado', 'd_asenta', 'd_mnpio').transform_values do |v|
       ("'#{v.to_s.downcase.parameterize(separator: ' ')}'" unless v.is_a? Integer || v.blank?) || v

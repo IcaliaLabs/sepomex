@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Liveness/readiness probe (returns 200 when the app boots without errors):
+  get '/up' => 'rails/health#show', as: :rails_health_check
+
+  # Model Context Protocol endpoint (Streamable HTTP: POST messages, GET/DELETE
+  # session lifecycle). Lets MCP clients query the postal-code catalog as tools.
+  match '/mcp', to: 'mcp#handle', via: %i[post get delete]
+
   namespace :api do
     namespace :v1 do
       resources :states, only: %i[index show]

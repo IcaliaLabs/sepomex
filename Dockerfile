@@ -1,8 +1,8 @@
 # Stage 1: Runtime =============================================================
 # The minimal package dependencies required to run the app in the release image:
 
-# Use the official Ruby 3.0 Slim Bullseye image as base:
-FROM ruby:3.0.7-slim-bullseye AS runtime
+# Use the official Ruby 3.4 Slim Bookworm image as base:
+FROM ruby:3.4.7-slim-bookworm AS runtime
 
 # We'll set MALLOC_ARENA_MAX for optimization purposes & prevent memory bloat
 # https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html
@@ -33,7 +33,9 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     build-essential \
     git \
-    libsqlite3-dev
+    libsqlite3-dev \
+    # Required to build the psych gem's native extension (YAML):
+    libyaml-dev
 
 # Receive the developer user's UID and USER:
 ARG DEVELOPER_UID=1000

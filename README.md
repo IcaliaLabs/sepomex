@@ -5,11 +5,16 @@ Sepomex is a REST API that maps all the data from the current zip codes in Mexic
 
 We build this API in order to provide a way to developers query the zip codes, states and municipalities across the country.
 
+It also ships a **[Model Context Protocol](#mcp-model-context-protocol) server**, so AI agents can query the same data as tools.
+
+**Stack:** Ruby 3.4 · Rails 8.1 (API-only) · SQLite (bundled data) · Puma.
+
 ## Table of contents
 
 - [Quick start](#quick-start)
 - [Querying the API](#querying-the-api)
 - [About pagination](#about-pagination)
+- [MCP (Model Context Protocol)](#mcp-model-context-protocol)
 - [Development](#development)
   - [Setup the project](#setup-the-project)
   - [Running the project](#running-the-project)
@@ -26,13 +31,14 @@ The base URI to start consuming the JSON response is under:
 http://sepomex.icalialabs.com/api/v1/zip_codes
 ```
 
-There are currently `145,481` records on the database which were extracted from the [CSV file](https://github.com/IcaliaLabs/sepomex/blob/master/lib/support/sepomex_db.csv) included in the project.
+There are currently `154,650` settlement records on the database which were extracted from the [CSV file](https://github.com/IcaliaLabs/sepomex/blob/master/lib/sepomex_db.csv) included in the project.
 
 Records are paginated with **15** records per page.
 
-### Running the project
-
-Pending. Here will be the instructions to run the project with Docker. TBD
+See [Development](#development) to run the project locally or with Docker. A
+liveness/readiness probe is available at `GET /up` (returns `200` when the app
+boots healthy). For AI agents, the same data is available through the
+[MCP server](#mcp-model-context-protocol).
 
 ## Querying the API
 
@@ -359,75 +365,98 @@ The structure of a paged response is:
   - ``prev`` is the url for the previous page.
   - ``next`` is the url for the next page.
 
+## MCP (Model Context Protocol)
+
+Beyond the REST API, Sepomex ships a **Model Context Protocol** server so AI
+agents (Claude Desktop, Claude Code, Cursor, …) can query Mexican postal codes
+as tools. Both transports below serve the same tools and reuse the same models
+as the REST API.
+
+### Tools
+
+| Tool | Description | Arguments |
+| --- | --- | --- |
+| `lookup_zip_code` | All settlements (colonias) for one exact CP | `zip_code` (required) |
+| `search_zip_codes` | Filter settlements | `zip_code`, `state`, `city`, `colony`, `limit` |
+| `list_states` | The 32 states | — |
+| `state_municipalities` | Municipalities of a state | `state_id` (required) |
+| `search_cities` | Cities by name | `query`, `limit` |
+
+Each tool returns a human-readable summary plus `structuredContent` (the same
+fields as the REST serializers).
+
+### HTTP (Streamable HTTP)
+
+The server is mounted at `/mcp` (stateless), alongside the REST API, so any
+Streamable-HTTP MCP client can point at `https://<your-host>/mcp`:
+
+```bash
+curl -X POST http://localhost:3000/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"lookup_zip_code","arguments":{"zip_code":"64000"}}}'
+```
+
+### stdio (local)
+
+`bin/mcp` serves the protocol over stdin/stdout against the local database. Add
+it to your MCP client config (e.g. Claude Desktop's `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "sepomex": {
+      "command": "/absolute/path/to/sepomex/bin/mcp"
+    }
+  }
+}
+```
+
+By default it uses the development database; set `RAILS_ENV=production` to serve
+the bundled production catalog instead.
+
 ## Development
 
-**Setup the project**
+The data lives in a bundled SQLite database, so there is no external database
+service to run. You can set the project up locally with `rbenv`/`ruby` or with
+Docker.
 
-To setup the project please follow this simple steps:
-
-1. Clone this repository into your local machine:
+**Local setup (rbenv / ruby)**
 
 ```bash
 $ git clone git@github.com:IcaliaLabs/sepomex.git
-```
-
-2. Change directory into the project folder:
-
-```bash
 $ cd sepomex
+$ bundle install
+$ bin/rails db:prepare        # create the SQLite database + load the schema
+$ bin/rake data:loadev        # import the ~154k settlements from the bundled CSV
+$ bin/rails server            # http://localhost:3000
 ```
 
-3. Run the web service in bash mode to get inside the container by using the following command:
+`rake data:loadev` loads the settlements, states, municipalities and cities from
+`lib/sepomex_db.csv` and builds the search indexes; it only runs when the
+database is empty.
+
+**Docker setup**
 
 ```bash
-$ docker-compose run web bash
-```
-
-4. Inside the container you need to migrate the database:
-
-```bash
-$ rails db:migrate
-```
-
-5. Next you should populate the database:
-
-```bash
-$ rake data:load
-```
-This operation will take some time, due to the number of records. Rake data load will load the data from the csv files into the database, like seed does. Also, it will create the indexes for the database.
-
-6. Close the container
-
-```bash
+$ git clone git@github.com:IcaliaLabs/sepomex.git
+$ cd sepomex
+# Open a shell in the development container:
+$ docker compose run --rm development bash
+# Inside the container, prepare and seed the database:
+$ bin/rails db:prepare
+$ bin/rake data:loadev
 $ exit
 ```
 
-**Running the project**
-
-1. Fire up a terminal and run:
+**Running the project (Docker)**
 
 ```bash
-$ docker-compose up
+$ docker compose up
 ```
 
-Once you see an output like this:
-
-```bash
-web_1        | The Gemfile's dependencies are satisfied
-web_1        | 2020/08/04 17:40:21 Waiting for: tcp://postgres:5432
-web_1        | 2020/08/04 17:40:21 Connected to tcp://postgres:5432
-web_1        | => Booting Puma
-web_1        | => Rails 6.0.3.2 application starting in development
-web_1        | => Run `rails server --help` for more startup options
-web_1        | Puma starting in single mode...
-web_1        | * Version 3.12.6 (ruby 2.7.1-p83), codename: Llamas in Pajamas
-web_1        | * Min threads: 5, max threads: 5
-web_1        | * Environment: development
-web_1        | * Listening on tcp://0.0.0.0:3000
-web_1        | Use Ctrl-C to stop
-```
-
-This means the project is up and running.
+The container entrypoint prepares the database automatically, and Puma listens
+on `http://localhost:3000`.
 
 **Stop the project**
 
@@ -436,15 +465,21 @@ This means the project is up and running.
 2. If you want to remove the containers use:
 
 ```bash
-$ docker-compose down
+$ docker compose down
 ```
 
 **Running specs**
 
-To run specs, you can do:
+Locally:
 
 ```bash
-$ docker-compose run test rspec
+$ bundle exec rspec
+```
+
+Or, in the tests container (as CI does):
+
+```bash
+$ docker compose run --rm tests
 ```
 
 ## Contributing
@@ -457,4 +492,4 @@ This project adheres to the [Contributor Covenant 1.2](http://contributor-covena
 
 ## Copyright and license
 
-Code and documentation copyright 2013-2020 Icalia Labs. Code released under [the MIT license](LICENSE).
+Code and documentation copyright 2013-2026 Icalia Labs. Code released under [the MIT license](LICENSE).

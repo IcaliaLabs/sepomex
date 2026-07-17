@@ -10,7 +10,15 @@
 # See https://docs.rubocop.org/rubocop/configuration
 # This is the configuration used by RuboCop. The item 'Enabled' will be read from the default configuration file, but can be overridden in this configuration file. See the RuboCop documentation for more information.
 
+plugins:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+
 AllCops:
+  TargetRubyVersion: 3.4
+  TargetRailsVersion: '8.1'
+  SuggestExtensions: false
   # Include common Ruby source files
   Include:
     - '**/*.gemspec'
@@ -23,3 +31,16 @@ AllCops:
     - 'db/**/*'
     - 'log/**/*'
     - 'bin/**/*'
+
+# Pragmatic thresholds for this small API-only app:
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/MethodLength:
+  Max: 15
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/ExampleLength:
+  Max: 15

@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# SEPOMEX MCP server over stdio.
+#
+# Boots the Rails application and serves the Model Context Protocol on
+# stdin/stdout, so local MCP clients (Claude Desktop, Claude Code, Cursor, …)
+# can query Mexico's postal-code catalog against the local SQLite database.
+#
+# Example MCP client config (e.g. Claude Desktop's claude_desktop_config.json):
+#
+#   {
+#     "mcpServers": {
+#       "sepomex": {
+#         "command": "/absolute/path/to/sepomex/bin/mcp"
+#       }
+#     }
+#   }
+#
+# Defaults to the development database; set RAILS_ENV=production to serve the
+# bundled production catalog instead.
+
+ENV['RAILS_ENV'] ||= 'development'
+
+# The JSON-RPC protocol owns $stdout, so make sure Rails never logs there and
+# corrupts the stream.
+ENV.delete('RAILS_LOG_TO_STDOUT')
+
+require_relative '../config/environment'
+
+# Route all Rails logging to $stderr, keeping $stdout clean for JSON-RPC frames.
+Rails.logger = ActiveSupport::TaggedLogging.new(Logger.new($stderr))
+
+transport = MCP::Server::Transports::StdioTransport.new(SepomexMcp.server)
+transport.open
