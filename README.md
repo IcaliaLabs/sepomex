@@ -20,6 +20,7 @@ It also ships a **[Model Context Protocol](#mcp-model-context-protocol) server**
   - [Running the project](#running-the-project)
   - [Stop the project](#stop-the-project)
   - [Running specs](#running-specs)
+- [Changelog](#changelog)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -481,6 +482,10 @@ Or, in the tests container (as CI does):
 ```bash
 $ docker compose run --rm tests
 ```
+
+## Changelog
+
+Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
