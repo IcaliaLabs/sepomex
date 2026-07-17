@@ -246,10 +246,12 @@ RUN SECRET_KEY_BASE=10167c7f7654ed02b3557b05b88ece rails secret > /dev/null
 # Set the installed app directory as the working directory:
 WORKDIR /workspaces/sepomex
 
-# Generate the sqlite production database:
-RUN rails db:create \
- && rails db:migrate \
- && rake data:load
+# Generate the sqlite production database. A throwaway SECRET_KEY_BASE lets the
+# app boot for these build-time tasks (they don't use it); the real value is
+# provided via SECRET_KEY_BASE / RAILS_MASTER_KEY in the environment at runtime.
+RUN SECRET_KEY_BASE=build_time_placeholder rails db:create \
+ && SECRET_KEY_BASE=build_time_placeholder rails db:migrate \
+ && SECRET_KEY_BASE=build_time_placeholder rake data:load
 
 # Set the entrypoint script:
 ENTRYPOINT [ "/workspaces/sepomex/bin/entrypoint" ]
