@@ -36,7 +36,7 @@ jobs:
         run: bundle exec rspec
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage/lcov.info
           # Don't fail CI if the coverage upload has a hiccup.
