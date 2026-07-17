@@ -52,7 +52,7 @@ jobs:
 
       - name: Open a PR if the dataset changed
         if: steps.src.outputs.url != ''
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/refresh-dataset
           add-paths: lib/sepomex_db.csv
