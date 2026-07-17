@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Interactive API docs (Swagger UI) + the raw OpenAPI spec, both under /api-docs.
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
+
   # Liveness/readiness probe (returns 200 when the app boots without errors):
   get '/up' => 'rails/health#show', as: :rails_health_check
 

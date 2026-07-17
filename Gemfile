@@ -32,6 +32,11 @@ gem 'rack-attack', '~> 6.7'
 # Model Context Protocol server — exposes the API as agentic tools
 gem 'mcp', '~> 0.4'
 
+# OpenAPI/Swagger docs: rswag-specs generates the spec from request specs;
+# rswag-api serves it and rswag-ui renders the interactive Swagger UI.
+gem 'rswag-api', '~> 2.13'
+gem 'rswag-ui', '~> 2.13'
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
@@ -62,5 +67,6 @@ end
 group :test do
   gem 'factory_bot_rails', '~> 6.4'
   gem 'rspec-rails', '>= 7.1'
+  gem 'rswag-specs', '~> 2.13'
   gem 'shoulda-matchers', '~> 6.0'
 end

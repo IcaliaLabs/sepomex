@@ -73,6 +73,9 @@ Prefer to run it yourself? Jump to [Development](#️-development). A health pro
 
 ## 🧭 Querying the API
 
+> **Interactive docs:** a Swagger UI is served at **`/api-docs`**, and the raw
+> OpenAPI 3 spec at **`/api-docs/v1/swagger.yaml`**.
+
 Four resources, all under `/api/v1`:
 
 | Resource | Endpoint | Notes |
