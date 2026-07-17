@@ -35,9 +35,10 @@ There are currently `154,650` settlement records on the database which were extr
 
 Records are paginated with **15** records per page.
 
-### Running the project
-
-Pending. Here will be the instructions to run the project with Docker. TBD
+See [Development](#development) to run the project locally or with Docker. A
+liveness/readiness probe is available at `GET /up` (returns `200` when the app
+boots healthy). For AI agents, the same data is available through the
+[MCP server](#mcp-model-context-protocol).
 
 ## Querying the API
 
