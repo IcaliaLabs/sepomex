@@ -39,6 +39,11 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Max: 15
 
+Metrics/BlockLength:
+  Exclude:
+    - 'lib/tasks/**/*'
+    - 'spec/**/*'
+
 RSpec/MultipleExpectations:
   Max: 5
 

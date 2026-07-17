@@ -483,6 +483,26 @@ Or, in the tests container (as CI does):
 $ docker compose run --rm tests
 ```
 
+### Refreshing the data
+
+The bundled dataset lives in `lib/sepomex_db.csv`. To update it from the latest
+official [SEPOMEX export](https://www.correosdemexico.gob.mx/SSLServicios/ConsultaCP/CodigoPostal_Exportar.aspx)
+(a `CPdescarga.xml` .NET DataSet file), regenerate the CSV and rebuild the
+database:
+
+```bash
+# Convert the XML export into lib/sepomex_db.csv (pipe-delimited, CRLF):
+$ rake "data:import_xml[/path/to/CPdescarga.xml]"
+
+# Rebuild the local database from the refreshed CSV:
+$ bin/rails db:reset          # drop + recreate + load schema
+$ rake data:loadev            # import the refreshed CSV
+```
+
+`data:import_xml` streams the XML (so the ~67 MB file never loads fully into
+memory) and writes the same 15 pipe-delimited columns the loader expects. The
+production image picks up the committed CSV on its next build.
+
 ## Changelog
 
 Notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
