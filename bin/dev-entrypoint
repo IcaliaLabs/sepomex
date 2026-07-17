@@ -25,11 +25,14 @@ run 'bundle check > /dev/null 2>&1 || bundle install'
 command = ARGV.first
 
 if %w[rails rake rspec puma].include?(command)
-  # Create + migrate the database if it isn't ready yet (idempotent):
-  run 'bundle exec rails db:prepare'
-
-  # Prepare the test database before running the suite:
-  run 'bundle exec rails db:test:prepare' if command == 'rspec'
+  # Prepare the database (create + load schema, idempotent). db:prepare — not
+  # db:test:prepare — because the SQL schema format (FTS5) trips the latter's
+  # environment check. Specs run against the test database.
+  if command == 'rspec'
+    run 'RAILS_ENV=test bundle exec rails db:prepare'
+  else
+    run 'bundle exec rails db:prepare'
+  end
 
   # Remove a possibly pre-existing server.pid before booting the server:
   if command == 'rails' && ARGV[1].to_s.start_with?('s')
