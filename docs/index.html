@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sepomex API — Documentation</title>
+<meta name="description" content="Reference documentation for the Sepomex REST + MCP API for Mexico's postal codes.">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  :root {
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  }
+  html[data-theme="light"], html:not([data-theme]) {
+    --bg:#fbfaf9; --bg-subtle:#f4f1ee; --bg-elev:#ffffff;
+    --fg:#211e1b; --fg-muted:#6d665f; --fg-faint:#9a938b;
+    --border:#e9e4df; --border-strong:#dcd6cf;
+    --accent:#c2693d; --accent-soft:rgba(194,105,61,.10); --accent-strong:#a9552d;
+    --get:#2f8a43; --get-bg:rgba(47,138,67,.12);
+    --post:#2f6fb0; --post-bg:rgba(47,111,176,.12);
+  }
+  html[data-theme="dark"] {
+    --bg:#191714; --bg-subtle:#221f1b; --bg-elev:#211e1a;
+    --fg:#f1ede8; --fg-muted:#a79f96; --fg-faint:#7c746b;
+    --border:#322d27; --border-strong:#3d372f;
+    --accent:#df8a5c; --accent-soft:rgba(223,138,92,.14); --accent-strong:#e79c72;
+    --get:#67c07a; --get-bg:rgba(103,192,122,.14);
+    --post:#6ea8e0; --post-bg:rgba(110,168,224,.14);
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-strong); }
+  ::selection { background: var(--accent-soft); }
+
+  header.topbar {
+    position: sticky; top: 0; z-index: 70; display: flex; align-items: center; gap: 12px;
+    height: 60px; padding: 0 clamp(14px,3vw,26px); background: var(--bg-elev); border-bottom: 1px solid var(--border);
+  }
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+    border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--fg); cursor: pointer; font-size: 15px;
+  }
+  .icon-btn:hover { background: var(--bg-subtle); }
+  #hamburger { display: none; }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand .mark { font-size: 20px; line-height: 1; }
+  .brand .word { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .pill-version { font: 600 10.5px/1 var(--mono); letter-spacing: .03em; padding: 3px 6px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); }
+  .gh {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 500; color: var(--fg-muted);
+    padding: 7px 11px; border-radius: 8px; border: 1px solid var(--border);
+  }
+  .gh:hover { color: var(--fg); background: var(--bg-subtle); }
+  .gh .glyph { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+  .shell { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 256px minmax(0,1fr); align-items: start; }
+  nav.sidebar {
+    position: sticky; top: 60px; max-height: calc(100vh - 60px); overflow-y: auto;
+    border-right: 1px solid var(--border); padding: 18px 12px 48px;
+  }
+  nav.sidebar .group { margin-top: 18px; }
+  nav.sidebar .group:first-child { margin-top: 4px; }
+  nav.sidebar .group-title { font: 600 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .11em; color: var(--fg-faint); padding: 0 12px; margin-bottom: 8px; }
+  nav.sidebar a { display: block; font-size: 13.5px; border-radius: 7px; padding: 6px 12px; color: var(--fg-muted); }
+  nav.sidebar a:hover { background: var(--bg-subtle); color: var(--fg); }
+  nav.sidebar a.active { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
+
+  main { padding: 0 clamp(18px,4vw,56px); min-width: 0; }
+  section { scroll-margin-top: 76px; padding: clamp(34px,4vw,52px) 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: none; }
+  .sec-grid { display: grid; gap: clamp(22px,3vw,44px); grid-template-columns: repeat(auto-fit, minmax(min(100%,380px),1fr)); align-items: start; }
+  .prose { min-width: 0; }
+  .code-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  .eyebrow { font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .13em; color: var(--accent); margin-bottom: 12px; }
+  h1 { font-size: clamp(28px,3.4vw,40px); font-weight: 700; letter-spacing: -.025em; margin: 0 0 16px; }
+  h2 { font-size: clamp(22px,2.4vw,28px); font-weight: 700; letter-spacing: -.02em; margin: 0 0 14px; }
+  h3 { font-size: 15px; font-weight: 600; margin: 22px 0 10px; }
+  p { font-size: 15px; line-height: 1.72; color: var(--fg-muted); margin: 0 0 14px; }
+  code.inline { font: 500 12.5px var(--mono); background: var(--bg-subtle); padding: 1px 5px; border-radius: 4px; color: var(--accent); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
+  .chip { font: 500 12.5px var(--mono); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px; color: var(--fg); }
+  .feature-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .feature-pills span { font-size: 12.5px; border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; color: var(--fg-muted); }
+
+  .pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 5px; font: 600 11px var(--mono); letter-spacing: .06em; }
+  .pill.get { color: var(--get); background: var(--get-bg); }
+  .pill.post { color: var(--post); background: var(--post-bg); }
+  .endpoint { display: flex; align-items: center; gap: 10px; margin: 8px 0; font: 500 13.5px var(--mono); color: var(--fg); flex-wrap: wrap; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th { font: 600 10.5px var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--fg-faint); background: var(--bg-subtle); text-align: left; padding: 9px 13px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 13px; border-bottom: 1px solid var(--border); color: var(--fg-muted); line-height: 1.55; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: var(--mono); color: var(--accent); white-space: nowrap; }
+
+  .callout { border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; background: var(--accent-soft); padding: 14px 16px; margin: 16px 0; }
+  .callout p { margin: 0; color: var(--fg); font-size: 14px; }
+
+  .code { border: 1px solid #302c25; border-radius: 10px; background: #1b1a17; overflow: hidden; font-family: var(--mono); }
+  .code-head { display: flex; align-items: center; justify-content: space-between; background: #232019; border-bottom: 1px solid #302c25; padding: 7px 10px 7px 13px; }
+  .code-label { font: 600 10.5px var(--mono); letter-spacing: .09em; text-transform: uppercase; color: #8f887d; }
+  .copy-btn { background: #2c2820; border: 1px solid #3a352c; border-radius: 6px; padding: 4px 9px; color: #c9c2b6; font: 500 11px var(--mono); cursor: pointer; }
+  .copy-btn:hover { background: #37322a; }
+  .code pre { margin: 0; padding: 13px 15px; font-size: 12.5px; line-height: 1.65; overflow-x: auto; color: #e8e3da; }
+  .code pre code { font-family: var(--mono); }
+  .tok-key { color: #d98a5f; } .tok-str { color: #9cbf6a; } .tok-num { color: #e0b168; }
+  .tok-bool { color: #74a8d1; } .tok-punc { color: #7d766b; } .tok-cmt { color: #6f685d; }
+  .tok-url { color: #d98a5f; } .tok-flag { color: #74a8d1; } .tok-kw { color: #e0b168; }
+
+  footer { padding: 28px clamp(18px,4vw,56px); border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; font-size: 13px; color: var(--fg-muted); }
+
+  #backdrop { display: none; position: fixed; inset: 60px 0 0 0; background: rgba(0,0,0,.42); z-index: 55; }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    nav.sidebar {
+      position: fixed; top: 60px; left: 0; bottom: 0; width: 260px; z-index: 60;
+      background: var(--bg-elev); transform: translateX(-110%); transition: transform .22s ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,.28); max-height: none;
+    }
+    nav.sidebar.open { transform: translateX(0); }
+    #hamburger { display: inline-flex; }
+    body.nav-open #backdrop { display: block; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <button id="hamburger" class="icon-btn" aria-label="Toggle navigation">&#9776;</button>
+    <div class="brand">
+      <span class="mark">&#128238;</span>
+      <span class="word">Sepomex</span>
+      <span class="pill-version">v1.0.0</span>
+    </div>
+    <div style="flex:1"></div>
+    <a class="gh" href="https://github.com/IcaliaLabs/sepomex" target="_blank" rel="noopener"><span class="glyph">&lt;/&gt;</span> GitHub</a>
+    <button id="theme-toggle" class="icon-btn" aria-label="Toggle color theme">&#9790;</button>
+  </header>
+
+  <div id="backdrop"></div>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar">
+      <div class="group">
+        <a href="#overview" data-nav="overview">Overview</a>
+        <a href="#conventions" data-nav="conventions">Conventions</a>
+      </div>
+      <div class="group">
+        <div class="group-title">Endpoints</div>
+        <a href="#zip-codes" data-nav="zip-codes">Zip Codes</a>
+        <a href="#states" data-nav="states">States</a>
+        <a href="#municipalities" data-nav="municipalities">Municipalities</a>
+        <a href="#cities" data-nav="cities">Cities</a>
+      </div>
+      <div class="group">
+        <div class="group-title">Reference</div>
+        <a href="#pagination" data-nav="pagination">Pagination</a>
+        <a href="#errors" data-nav="errors">Errors</a>
+        <a href="#mcp" data-nav="mcp">MCP Server</a>
+        <a href="#quickstart" data-nav="quickstart">Quickstart</a>
+      </div>
+    </nav>
+
+    <main>
+      <!-- OVERVIEW -->
+      <section id="overview" data-section="overview">
+        <div class="sec-grid">
+          <div class="prose">
+            <div class="eyebrow">Reference</div>
+            <h1>Sepomex API</h1>
+            <p>Open REST API for Mexico's official postal-code (código postal) catalog — <strong>~154,650 settlements</strong> across 32 states, ~2,475 municipalities and ~660 cities, from a bundled SQLite dataset. Read-only, public, no API key.</p>
+            <p>All endpoints live under the <code class="inline">/api/v1</code> path. Prefix it with your deployment host (examples below use <code class="inline">http://localhost:3000</code> from a local run).</p>
+            <div class="chips"><span class="chip">/api/v1</span></div>
+            <div class="feature-pills">
+              <span>No API key</span><span>Public</span><span>CORS-enabled</span><span>Read-only</span>
+            </div>
+            <p><strong>Stack:</strong> Ruby 3.4 · Rails 8.1 (API-only) · SQLite · Puma.</p>
+            <div class="callout"><p>AI agent? Skip the REST calls — query the same data as tools through the <a href="#mcp">MCP server</a>.</p></div>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Health check</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl http://localhost:3000/up</code></pre>
+            </div>
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">First request</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl "http://localhost:3000/api/v1/zip_codes?zip_code=64000"</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONVENTIONS -->
+      <section id="conventions" data-section="conventions">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Conventions</h2>
+            <p>All responses are JSON. Collections are wrapped in a resource root key (e.g. <code class="inline">zip_codes</code>) plus a <code class="inline">meta</code> object; a single resource uses its singular key (e.g. <code class="inline">state</code>).</p>
+            <p>List endpoints are paginated: <strong>15</strong> items per page by default, up to <strong>200</strong> via <code class="inline">per_page</code> (larger values fall back to 15). Combine with <code class="inline">page</code>. Every list response carries a <code class="inline">meta.pagination</code> block and the <code class="inline">Link</code>, <code class="inline">X-Total-Pages</code> and <code class="inline">X-Total-Count</code> response headers.</p>
+            <p>Interactive docs (Swagger UI) are served at <code class="inline">/api-docs</code>, and the raw OpenAPI 3 spec at <code class="inline">/api-docs/v1/swagger.yaml</code>.</p>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">meta.pagination</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{
+  "meta": {
+    "pagination": {
+      "per_page": 15,
+      "total_pages": 9728,
+      "total_objects": 145906,
+      "links": {
+        "first": "/api/v1/zip_codes?page=1",
+        "last": "/api/v1/zip_codes?page=9728",
+        "next": "/api/v1/zip_codes?page=2"
+      }
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ZIP CODES -->
+      <section id="zip-codes" data-section="zip-codes">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Zip Codes</h2>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/zip_codes</div>
+            <p>Search settlements (colonias) by any combination of the parameters below. All filters are partial and accent-insensitive.</p>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">zip_code</td><td>string</td><td>Postal code, full or partial (e.g. "64000").</td></tr>
+                <tr><td class="mono">state</td><td>string</td><td>State name (e.g. "nuevo leon").</td></tr>
+                <tr><td class="mono">city</td><td>string</td><td>City or municipality name (e.g. "monterrey").</td></tr>
+                <tr><td class="mono">colony</td><td>string</td><td>Colony / settlement name (e.g. "del valle").</td></tr>
+                <tr><td class="mono">per_page</td><td>integer</td><td>Items per page (default 15, max 200).</td></tr>
+                <tr><td class="mono">page</td><td>integer</td><td>Page number (default 1).</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Requests</span><button class="copy-btn">Copy</button></div>
+              <pre><code># by postal code
+curl "http://localhost:3000/api/v1/zip_codes?zip_code=67173"
+
+# by city / municipality
+curl "http://localhost:3000/api/v1/zip_codes?city=monterrey"
+
+# by state
+curl "http://localhost:3000/api/v1/zip_codes?state=nuevo%20leon"
+
+# by colony
+curl "http://localhost:3000/api/v1/zip_codes?colony=del%20valle"
+
+# combined
+curl "http://localhost:3000/api/v1/zip_codes?state=nuevo%20leon&city=guadalupe"</code></pre>
+            </div>
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">Response</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{
+  "zip_codes": [
+    {
+      "id": 1,
+      "d_codigo": "01000",
+      "d_asenta": "San Ángel",
+      "d_tipo_asenta": "Colonia",
+      "d_mnpio": "Álvaro Obregón",
+      "d_estado": "Ciudad de México",
+      "d_ciudad": "Ciudad de México",
+      "d_cp": "01001",
+      "c_estado": "09",
+      "c_oficina": "01001",
+      "c_cp": null,
+      "c_tipo_asenta": "09",
+      "c_mnpio": "010",
+      "id_asenta_cpcons": "0001",
+      "d_zona": "Urbano",
+      "c_cve_ciudad": "01"
+    }
+  ],
+  "meta": { "pagination": { "per_page": 15, "total_pages": 9728, "total_objects": 145906 } }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATES -->
+      <section id="states" data-section="states">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>States</h2>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/states</div>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/states/:id</div>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/states/:id/municipalities</div>
+            <p>A state object is <code class="inline">{ id, name, cities_count }</code>. The nested <code class="inline">municipalities</code> route returns that state's municipalities (unpaginated).</p>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Requests</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl "http://localhost:3000/api/v1/states"
+curl "http://localhost:3000/api/v1/states/1"
+curl "http://localhost:3000/api/v1/states/1/municipalities"</code></pre>
+            </div>
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">Response</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{ "state": { "id": 1, "name": "Ciudad de México", "cities_count": 16 } }
+
+// GET /api/v1/states/1/municipalities
+{
+  "municipalities": [
+    { "id": 1, "name": "Álvaro Obregón", "municipality_key": "010", "zip_code": "01001", "state_id": 1 }
+  ]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MUNICIPALITIES -->
+      <section id="municipalities" data-section="municipalities">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Municipalities</h2>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/municipalities</div>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/municipalities/:id</div>
+            <p>A municipality object is <code class="inline">{ id, name, municipality_key, zip_code, state_id }</code>.</p>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Requests</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl "http://localhost:3000/api/v1/municipalities"
+curl "http://localhost:3000/api/v1/municipalities/1"</code></pre>
+            </div>
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">Response</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{
+  "municipality": {
+    "id": 1,
+    "name": "Álvaro Obregón",
+    "municipality_key": "010",
+    "zip_code": "01001",
+    "state_id": 1
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CITIES -->
+      <section id="cities" data-section="cities">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Cities</h2>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/cities</div>
+            <div class="endpoint"><span class="pill get">GET</span> /api/v1/cities/:id</div>
+            <p>A city object is <code class="inline">{ id, name, state_id }</code>.</p>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Requests</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl "http://localhost:3000/api/v1/cities"
+curl "http://localhost:3000/api/v1/cities/1"</code></pre>
+            </div>
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">Response</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{ "city": { "id": 1, "name": "Ciudad de México", "state_id": 1 } }</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGINATION -->
+      <section id="pagination" data-section="pagination">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Pagination</h2>
+            <p>List endpoints accept <code class="inline">page</code> and <code class="inline">per_page</code> (default 15, max 200). Each response includes a <code class="inline">meta.pagination</code> block whose <code class="inline">links</code> preserve the current query string.</p>
+            <p>The same values are also returned as response headers:</p>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Header</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">Link</td><td>first / last / prev / next URLs (RFC 8288).</td></tr>
+                <tr><td class="mono">X-Total-Pages</td><td>Total number of pages.</td></tr>
+                <tr><td class="mono">X-Total-Count</td><td>Total number of records.</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Request</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl -i "http://localhost:3000/api/v1/zip_codes?per_page=200&page=2"</code></pre>
+            </div>
+            <div class="code" data-lang="http">
+              <div class="code-head"><span class="code-label">Response headers</span><button class="copy-btn">Copy</button></div>
+              <pre><code>X-Total-Pages: 730
+X-Total-Count: 145906
+Link: &lt;http://localhost:3000/api/v1/zip_codes?page=1&per_page=200&gt;; rel="first"</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ERRORS -->
+      <section id="errors" data-section="errors">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Errors</h2>
+            <p>Errors are returned as JSON with a consistent envelope: <code class="inline">{ error, message, status }</code>.</p>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">200</td><td>OK.</td></tr>
+                <tr><td class="mono">400</td><td>Bad Request — a required parameter is missing.</td></tr>
+                <tr><td class="mono">404</td><td>Not Found — no record with that <code class="inline">:id</code>.</td></tr>
+                <tr><td class="mono">429</td><td>Too Many Requests — client is being rate-limited (includes <code class="inline">Retry-After</code>).</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">404 Not Found</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{
+  "error": "Not Found",
+  "message": "Couldn't find State with 'id'=999999",
+  "status": 404
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MCP -->
+      <section id="mcp" data-section="mcp">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>MCP Server</h2>
+            <p>Sepomex ships a <strong>Model Context Protocol</strong> server so AI agents (Claude Desktop, Claude Code, Cursor, …) can query the catalog as tools. Two transports serve the same tools:</p>
+            <div class="endpoint"><span class="pill post">POST</span> /mcp <span style="color:var(--fg-faint)">— Streamable HTTP (stateless JSON-RPC)</span></div>
+            <div class="endpoint"><span class="pill get">bin/mcp</span> <span style="color:var(--fg-faint)">— stdio, for local clients</span></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Tool</th><th>Description</th><th>Arguments</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">lookup_zip_code</td><td>All settlements for one exact CP.</td><td class="mono">zip_code*</td></tr>
+                <tr><td class="mono">search_zip_codes</td><td>Filter settlements.</td><td class="mono">zip_code, state, city, colony, limit</td></tr>
+                <tr><td class="mono">list_states</td><td>The 32 states.</td><td>—</td></tr>
+                <tr><td class="mono">state_municipalities</td><td>Municipalities of a state.</td><td class="mono">state_id*</td></tr>
+                <tr><td class="mono">search_cities</td><td>Cities by name.</td><td class="mono">query, limit</td></tr>
+              </tbody>
+            </table></div>
+            <p style="font-size:13px">* required. Each tool returns a human-readable summary plus <code class="inline">structuredContent</code> (the same fields as the REST serializers).</p>
+            <h3>Add it to a client</h3>
+            <p>Claude Code (HTTP): <code class="inline">claude mcp add --transport http sepomex http://localhost:3000/mcp</code></p>
+            <p>Local stdio: point your client's <code class="inline">command</code> at <code class="inline">bin/mcp</code> (see the config on the right), then restart the client.</p>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">HTTP — tools/call</span><button class="copy-btn">Copy</button></div>
+              <pre><code>curl -X POST http://localhost:3000/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call",
+       "params":{"name":"lookup_zip_code",
+                 "arguments":{"zip_code":"64000"}}}'</code></pre>
+            </div>
+            <div class="code" data-lang="json">
+              <div class="code-head"><span class="code-label">stdio — client config</span><button class="copy-btn">Copy</button></div>
+              <pre><code>{
+  "mcpServers": {
+    "sepomex": {
+      "command": "/absolute/path/to/sepomex/bin/mcp"
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUICKSTART -->
+      <section id="quickstart" data-section="quickstart">
+        <div class="sec-grid">
+          <div class="prose">
+            <h2>Quickstart / Self-host</h2>
+            <p>The dataset ships inside the app as SQLite — no external database to provision.</p>
+            <div class="callout"><p>Refresh the dataset from the latest official SEPOMEX XML export with <code class="inline">rake "data:import_xml[/path/to/CPdescarga.xml]"</code>, then rebuild the database.</p></div>
+          </div>
+          <div class="code-col">
+            <div class="code" data-lang="bash">
+              <div class="code-head"><span class="code-label">Run it locally</span><button class="copy-btn">Copy</button></div>
+              <pre><code>git clone git@github.com:IcaliaLabs/sepomex.git
+cd sepomex
+bundle install
+bin/rails db:prepare      # create SQLite DB + schema
+bin/rake data:loadev      # import ~154k settlements
+bin/rails server          # http://localhost:3000</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <span>MIT License · © 2026 Icalia Labs</span>
+    <span><a href="https://github.com/IcaliaLabs/sepomex">github.com/IcaliaLabs/sepomex</a> · v1.0.0</span>
+  </footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+
+  // ---- Theme ----
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(prefersDark ? 'dark' : 'light');
+  document.getElementById('theme-toggle').addEventListener('click', function () {
+    setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    document.getElementById('theme-toggle').innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  }
+
+  // ---- Mobile drawer ----
+  var sidebar = document.getElementById('sidebar');
+  document.getElementById('hamburger').addEventListener('click', toggleNav);
+  document.getElementById('backdrop').addEventListener('click', closeNav);
+  function toggleNav() { sidebar.classList.toggle('open'); document.body.classList.toggle('nav-open'); }
+  function closeNav() { sidebar.classList.remove('open'); document.body.classList.remove('nav-open'); }
+
+  // ---- Smooth anchor nav + active state ----
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.sidebar a[href^="#"]'));
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      var el = document.getElementById(link.getAttribute('href').slice(1));
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 72, behavior: 'smooth' });
+      setActive(link.getAttribute('href').slice(1));
+      closeNav();
+    });
+  });
+  function setActive(id) {
+    navLinks.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
+  }
+
+  // ---- Scroll spy ----
+  var sections = Array.prototype.slice.call(document.querySelectorAll('[data-section]'));
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) setActive(en.target.id); });
+    }, { rootMargin: '-84px 0px -68% 0px', threshold: 0 });
+    sections.forEach(function (s) { obs.observe(s); });
+  }
+
+  // ---- Copy buttons ----
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = block.querySelector('.copy-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var text = block.querySelector('pre').innerText;
+      var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta); done();
+      }
+    });
+  });
+
+  // ---- Lightweight syntax highlighting ----
+  document.querySelectorAll('.code').forEach(function (block) {
+    var lang = block.getAttribute('data-lang');
+    var codeEl = block.querySelector('pre code');
+    if (!codeEl) return;
+    var raw = codeEl.textContent;
+    codeEl.innerHTML = (lang === 'json') ? hlJson(raw) : hlShell(raw);
+  });
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function hlJson(s) {
+    return esc(s)
+      .replace(/(&quot;(?:[^&]|&(?!quot;))*?&quot;)(\s*:)/g, '<span class="tok-key">$1</span>$2')
+      .replace(/:\s*(&quot;(?:[^&]|&(?!quot;))*?&quot;)/g, ': <span class="tok-str">$1</span>')
+      .replace(/\b(true|false|null)\b/g, '<span class="tok-bool">$1</span>')
+      .replace(/(:\s*)(-?\d+(?:\.\d+)?)/g, '$1<span class="tok-num">$2</span>');
+  }
+  function hlShell(s) {
+    return esc(s).split('\n').map(function (line) {
+      if (/^\s*#/.test(line)) return '<span class="tok-cmt">' + line + '</span>';
+      return line
+        .replace(/(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;)/g, '<span class="tok-str">$1</span>')
+        .replace(/(\shttps?:[^\s"'&]+)/g, '<span class="tok-url">$1</span>')
+        .replace(/(\s)(-[A-Za-z])\b/g, '$1<span class="tok-flag">$2</span>')
+        .replace(/\b(curl|git|cd|bundle|rake|bin\/rails|bin\/mcp|claude|GET|POST)\b/g, '<span class="tok-kw">$1</span>');
+    }).join('\n');
+  }
+})();
+</script>
+</body>
+</html>
