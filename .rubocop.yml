@@ -64,3 +64,13 @@ RSpec/MultipleExpectations:
 
 RSpec/ExampleLength:
   Max: 15
+
+# rswag request specs use a path/response/run_test! DSL that RuboCop-RSpec
+# doesn't recognize (it reads the groups as empty and the query-param `let`s as
+# excess memoized helpers).
+RSpec/EmptyExampleGroup:
+  Exclude:
+    - 'spec/requests/api/**/*'
+RSpec/MultipleMemoizedHelpers:
+  Exclude:
+    - 'spec/requests/api/**/*'
