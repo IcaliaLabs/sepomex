@@ -71,7 +71,7 @@ jobs:
         run: docker compose run --rm tests
 
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: system-spec-screenshots
