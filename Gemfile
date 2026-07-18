@@ -68,7 +68,7 @@ group :test do
   gem 'factory_bot_rails', '~> 6.4'
   gem 'rspec-rails', '>= 7.1'
   gem 'rswag-specs', '~> 2.13'
-  gem 'shoulda-matchers', '~> 6.0'
+  gem 'shoulda-matchers', '~> 8.0'
 
   # Test coverage (+ lcov report for the Codecov upload / badge)
   gem 'simplecov', '~> 1.0', require: false
