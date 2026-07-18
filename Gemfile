@@ -71,6 +71,6 @@ group :test do
   gem 'shoulda-matchers', '~> 6.0'
 
   # Test coverage (+ lcov report for the Codecov upload / badge)
-  gem 'simplecov', '~> 0.22', require: false
+  gem 'simplecov', '~> 1.0', require: false
   gem 'simplecov-lcov', '~> 0.8', require: false
 end
