@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - # We'll generate a unique id that we'll use to identify the build run
         # on our systems
