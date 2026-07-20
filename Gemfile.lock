@@ -197,7 +197,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.2.1)
-    mcp (0.24.0)
+    mcp (0.25.0)
       json_schemer (>= 2.4)
     mini_mime (1.1.5)
     minitest (6.0.6)
@@ -469,7 +469,7 @@ DEPENDENCIES
   debug
   factory_bot_rails (~> 6.4)
   listen (~> 3.9)
-  mcp (~> 0.4)
+  mcp (~> 0.25)
   puma (>= 6.0)
   rack-attack (~> 6.7)
   rack-cors (~> 3.0)

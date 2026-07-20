@@ -30,7 +30,7 @@ gem 'rack-cors', '~> 3.0'
 gem 'rack-attack', '~> 6.7'
 
 # Model Context Protocol server — exposes the API as agentic tools
-gem 'mcp', '~> 0.4'
+gem 'mcp', '~> 0.25'
 
 # OpenAPI/Swagger docs: rswag-specs generates the spec from request specs;
 # rswag-api serves it and rswag-ui renders the interactive Swagger UI.
