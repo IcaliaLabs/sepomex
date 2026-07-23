@@ -11,8 +11,10 @@ info:
     name: MIT
     url: https://github.com/IcaliaLabs/sepomex/blob/main/LICENSE
 servers:
+- url: https://sepomex.kurenn.dev
+  description: Hosted (best-effort community instance, rate-limited, no SLA)
 - url: http://localhost:3000
-  description: Local
+  description: Local (self-hosted)
 paths:
   "/api/v1/cities":
     get:

@@ -59,3 +59,12 @@ db/dumps/*
 !/tmp/pids/
 !/tmp/pids/.keep
 /coverage
+
+# ---------------------------------------------------------------------------
+# Deployment (Fly.io + Cloudflare) — local-only, never committed.
+# fly.toml holds infra topology; the rest can hold API tokens / secrets.
+# ---------------------------------------------------------------------------
+/fly.toml
+/.fly/
+/.env.deploy
+/deploy/

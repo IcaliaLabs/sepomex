@@ -173,12 +173,13 @@
             <div class="eyebrow">Reference</div>
             <h1>Sepomex API</h1>
             <p>Open REST API for Mexico's official postal-code (código postal) catalog — <strong>~154,650 settlements</strong> across 32 states, ~2,475 municipalities and ~660 cities, from a bundled SQLite dataset. Read-only, public, no API key.</p>
-            <p>All endpoints live under the <code class="inline">/api/v1</code> path. Prefix it with your deployment host (examples below use <code class="inline">http://localhost:3000</code> from a local run).</p>
+            <p>All endpoints live under the <code class="inline">/api/v1</code> path. Prefix it with your deployment host — the examples below use <code class="inline">http://localhost:3000</code> from a local run, but a hosted instance also runs at <code class="inline">https://sepomex.kurenn.dev</code>.</p>
             <div class="chips"><span class="chip">/api/v1</span></div>
             <div class="feature-pills">
               <span>No API key</span><span>Public</span><span>CORS-enabled</span><span>Read-only</span>
             </div>
             <p><strong>Stack:</strong> Ruby 3.4 · Rails 8.1 (API-only) · SQLite · Puma.</p>
+            <div class="callout"><p><strong>Hosted instance:</strong> try it now at <a href="https://sepomex.kurenn.dev/api/v1/zip_codes?zip_code=64000" target="_blank" rel="noopener"><code class="inline">sepomex.kurenn.dev</code></a> — a free, best-effort community instance (rate-limited, no SLA). Self-host for production; the dataset ships with the code.</p></div>
             <div class="callout"><p>AI agent? Skip the REST calls — query the same data as tools through the <a href="#mcp">MCP server</a>.</p></div>
           </div>
           <div class="code-col">

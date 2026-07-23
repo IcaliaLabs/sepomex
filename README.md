@@ -14,7 +14,7 @@
 [![MCP](https://img.shields.io/badge/MCP-ready-c2693d)](#-mcp-server)
 [![License](https://img.shields.io/badge/License-MIT-c2693d)](LICENSE)
 
-[Quick start](#-quick-start) · [Querying the API](#-querying-the-api) · [MCP server](#-mcp-server) · [Development](#️-development) · [Architecture](#-architecture)
+[Quick start](#-quick-start) · [Hosted instance](#-hosted-instance) · [Querying the API](#-querying-the-api) · [MCP server](#-mcp-server) · [Development](#️-development) · [Architecture](#-architecture)
 
 </div>
 
@@ -37,6 +37,26 @@ The whole catalog (~154k settlements) ships **inside the app as a SQLite databas
 - 🐳 **Dockerized** — multi-stage build, one-command dev environment, CI that ships images to Docker Hub.
 
 > **No key, no quota, no tracking.** Sepomex is a read-only public API over public data. Host your own in minutes — the dataset travels with the code.
+
+## 🌐 Hosted instance
+
+Sepomex is designed to be **self-hosted** — the whole catalog ships with the
+code, so standing up your own copy is [a few commands](#️-development). But if you
+just want to try it (or wire up a quick prototype), a **free public instance**
+runs at:
+
+```
+https://sepomex.kurenn.dev
+```
+
+```bash
+curl "https://sepomex.kurenn.dev/api/v1/zip_codes?zip_code=64000"
+```
+
+This is a **best-effort community instance** — a single small server, rate-limited
+to ~300 requests per 5 minutes per IP, with no uptime or availability guarantee.
+**For production traffic, or anything you depend on, run your own** (see
+[Development](#️-development)); it's the same image this instance runs.
 
 ## 🚀 Quick start
 
@@ -274,14 +294,20 @@ docker compose run --rm tests     # in the container (as CI does)
 
 ### Refreshing the data
 
-Update the bundled dataset from the latest official [SEPOMEX export](https://www.correosdemexico.gob.mx/SSLServicios/ConsultaCP/CodigoPostal_Exportar.aspx) (a `CPdescarga.xml` file):
+The bundled dataset tracks the official [SEPOMEX export](https://www.correosdemexico.gob.mx/SSLServicios/ConsultaCP/CodigoPostal_Exportar.aspx). One command downloads the latest export and regenerates the CSV:
+
+```bash
+rake data:refresh                       # download the export + rebuild lib/sepomex_db.csv
+bin/rails db:reset && rake data:loadev  # rebuild the local DB from it
+```
+
+`data:refresh` performs the export site's form postback for you (via `FetchSepomexExport`), so there's no file to download by hand. Already have a `CPdescarga.xml`? Import it directly instead:
 
 ```bash
 rake "data:import_xml[/path/to/CPdescarga.xml]"   # regenerate lib/sepomex_db.csv
-bin/rails db:reset && rake data:loadev            # rebuild the DB from it
 ```
 
-`data:import_xml` streams the XML (so the ~67 MB file never loads fully into memory) and writes the pipe-delimited CSV the loader consumes.
+Both stream the ~67 MB XML (it never loads fully into memory) and write the pipe-delimited CSV the loader consumes. A scheduled [`data-refresh` workflow](.github/workflows/data-refresh.yml) runs `data:refresh` monthly and opens a PR whenever the data changes.
 
 ## 🧱 Architecture
 
@@ -307,7 +333,6 @@ Pushing to `main` runs the GitHub Actions pipeline (`.github/workflows`): it bui
 
 ## 🗺️ Roadmap
 
-- Automate the data refresh from the official XML export.
 - Optional bearer-token gating for the MCP endpoint.
 - Deeper agentic tooling (specialist agents / plugins).
 
