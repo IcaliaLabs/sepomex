@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Self-contained data refresh** — `rake data:refresh` downloads the latest
+  official SEPOMEX export directly (via the new `FetchSepomexExport` service,
+  which drives the `CodigoPostal_Exportar.aspx` form postback) and regenerates
+  `lib/sepomex_db.csv` in one step. The monthly `data-refresh` workflow now runs
+  it with no manually-provisioned mirror URL.
+- Documented the **hosted community instance** at `https://sepomex.kurenn.dev`
+  (README, docs site, OpenAPI `servers`) as a best-effort alternative to
+  self-hosting.
+
+### Changed
+- `data-refresh` workflow no longer no-ops without a `SEPOMEX_XML_URL` variable;
+  the scheduled run fetches the export itself (a `xml_url` dispatch input still
+  overrides it with a specific hosted file).
+- Migrated `spec_helper` off deprecated SimpleCov `add_filter`/`add_group`
+  (→ `skip`/`group`).
+
+### Removed
+- Dropped the stale `lib/sepomex_db.csv.old` snapshot (~14 MB) from the repo.
+
 ## [1.0.0] - 2026-07-17
 
 First tagged release — modernizes the stack and adds an MCP server. The public

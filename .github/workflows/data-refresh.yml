@@ -1,17 +1,18 @@
 name: Refresh dataset
 
-# Regenerates lib/sepomex_db.csv from the latest official SEPOMEX XML export and
+# Regenerates lib/sepomex_db.csv from the latest official SEPOMEX export and
 # opens a PR when the data changes.
 #
-# The official export (CodigoPostal_Exportar.aspx) is behind a web form, so it
-# has no stable direct-download URL. Provide the URL of a `CPdescarga.xml` via
-# the workflow_dispatch input or a `SEPOMEX_XML_URL` repository variable; the
-# scheduled run is a no-op when neither is set.
+# The scheduled run is self-contained: `rake data:refresh` downloads the export
+# straight from Correos de México (the CodigoPostal_Exportar.aspx WebForms
+# postback, handled by FetchSepomexExport) and regenerates the CSV — no mirror
+# URL to provision. Pass a `xml_url` on manual dispatch to import a specific,
+# already-hosted `CPdescarga.xml` instead (e.g. to reproduce a past export).
 on:
   workflow_dispatch:
     inputs:
       xml_url:
-        description: URL to a SEPOMEX CPdescarga.xml export
+        description: Optional URL to a specific SEPOMEX CPdescarga.xml (skips the live download)
         required: false
   schedule:
     - cron: "0 6 1 * *" # 06:00 UTC on the 1st of each month
@@ -19,6 +20,10 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
 
 jobs:
   refresh:
@@ -32,26 +37,17 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Resolve the XML source
-        id: src
+      - name: Regenerate lib/sepomex_db.csv from the latest export
+        if: github.event.inputs.xml_url == ''
+        run: bundle exec rake data:refresh
+
+      - name: Regenerate lib/sepomex_db.csv from a provided URL
+        if: github.event.inputs.xml_url != ''
         run: |
-          url="${{ github.event.inputs.xml_url }}"
-          [ -z "$url" ] && url="${{ vars.SEPOMEX_XML_URL }}"
-          if [ -z "$url" ]; then
-            echo "No xml_url input or SEPOMEX_XML_URL variable set — nothing to do."
-          fi
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-
-      - name: Download the SEPOMEX XML
-        if: steps.src.outputs.url != ''
-        run: curl -fSL "${{ steps.src.outputs.url }}" -o "${RUNNER_TEMP}/CPdescarga.xml"
-
-      - name: Regenerate lib/sepomex_db.csv
-        if: steps.src.outputs.url != ''
-        run: bundle exec rake "data:import_xml[${RUNNER_TEMP}/CPdescarga.xml]"
+          curl -fSL "${{ github.event.inputs.xml_url }}" -o "${RUNNER_TEMP}/CPdescarga.xml"
+          bundle exec rake "data:import_xml[${RUNNER_TEMP}/CPdescarga.xml]"
 
       - name: Open a PR if the dataset changed
-        if: steps.src.outputs.url != ''
         uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/refresh-dataset
@@ -61,7 +57,7 @@ jobs:
           labels: data
           body: |
             Automated refresh of `lib/sepomex_db.csv` from the latest official
-            SEPOMEX XML export.
+            SEPOMEX export (`rake data:refresh`).
 
             After merging, the next release image bakes in the new data; to update
             a running/local database, run `bin/rails db:reset && rake data:loadev`.
