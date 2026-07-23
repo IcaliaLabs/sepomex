@@ -27,3 +27,15 @@ spec/
 # Ignore database dumps
 db/dumps/*
 !db/dumps/.keep
+
+# Never ship local dev/test databases (33MB+) — the release stage builds
+# db/production.sqlite3 from scratch via db:create + db:migrate + data:load.
+db/*.sqlite3
+db/*.sqlite3-*
+
+# SimpleCov output.
+coverage/
+
+# Fly.io deploy config — not part of the app image.
+fly.toml
+.fly/

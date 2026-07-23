@@ -11,12 +11,12 @@ end
 
 SimpleCov.start 'rails' do
   enable_coverage :branch
-  add_filter %w[/spec/ /config/ /db/ /bin/ /vendor/]
+  skip %w[/spec/ /config/ /db/ /bin/ /vendor/]
   # Unused Rails framework stubs in this API-only app.
-  add_filter %w[/app/channels/ /app/jobs/ /app/mailers/]
-  add_group 'MCP', 'app/mcp'
-  add_group 'Services', 'app/services'
-  add_group 'Serializers', 'app/serializers'
+  skip %w[/app/channels/ /app/jobs/ /app/mailers/]
+  group 'MCP', 'app/mcp'
+  group 'Services', 'app/services'
+  group 'Serializers', 'app/serializers'
   formatter SimpleCov::Formatter::MultiFormatter.new(
     [SimpleCov::Formatter::HTMLFormatter, SimpleCov::Formatter::LcovFormatter]
   )
