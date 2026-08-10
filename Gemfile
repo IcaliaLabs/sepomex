@@ -55,7 +55,7 @@ group :development do
   # Ruby code linters:
   gem 'reek', '~> 6.3', require: false
 
-  gem 'rubocop',             '~> 1.60', require: false
+  gem 'rubocop',             '~> 1.89', require: false
   gem 'rubocop-performance', '~> 1.20', require: false
   gem 'rubocop-rails',       '~> 2.23', require: false
   gem 'rubocop-rspec',       '~> 3.0',  require: false
