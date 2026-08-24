@@ -56,7 +56,7 @@ group :development do
   gem 'reek', '~> 6.3', require: false
 
   gem 'rubocop',             '~> 1.60', require: false
-  gem 'rubocop-performance', '~> 1.20', require: false
+  gem 'rubocop-performance', '~> 1.27', require: false
   gem 'rubocop-rails',       '~> 2.23', require: false
   gem 'rubocop-rspec',       '~> 3.0',  require: false
 
