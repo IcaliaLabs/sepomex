@@ -11,7 +11,7 @@ a **bundled SQLite database** loaded from `lib/sepomex_db.csv`. It exposes a
 read-only JSON REST API under `/api/v1` and a **Model Context Protocol** server at
 `/mcp` (and via `bin/mcp`).
 
-**Stack:** Ruby 3.4.7 · Rails 8.1 (`config.api_only`) · SQLite (`sqlite3` 2.x) ·
+**Stack:** Ruby 3.4.12 · Rails 8.1 (`config.api_only`) · SQLite (`sqlite3` 2.x) ·
 Puma · Active Model Serializers (`:json` adapter) · `mcp` gem.
 
 ## Building features & fixing bugs
