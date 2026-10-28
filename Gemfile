@@ -30,7 +30,7 @@ gem 'rack-cors', '~> 3.0'
 gem 'rack-attack', '~> 6.7'
 
 # Model Context Protocol server — exposes the API as agentic tools
-gem 'mcp', '~> 0.25'
+gem 'mcp', '~> 1.2'
 
 # OpenAPI/Swagger docs: rswag-specs generates the spec from request specs;
 # rswag-api serves it and rswag-ui renders the interactive Swagger UI.
@@ -55,13 +55,13 @@ group :development do
   # Ruby code linters:
   gem 'reek', '~> 6.3', require: false
 
-  gem 'rubocop',             '~> 1.60', require: false
+  gem 'rubocop',             '~> 1.89', require: false
   gem 'rubocop-performance', '~> 1.20', require: false
   gem 'rubocop-rails',       '~> 2.23', require: false
   gem 'rubocop-rspec',       '~> 3.0',  require: false
 
   # IDE tools for code completion, inline documentation, and static analysis
-  gem 'solargraph', '~> 0.50', require: false
+  gem 'solargraph', '~> 0.60', require: false
 end
 
 group :test do
