@@ -3,10 +3,10 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.4.7'
+ruby '3.4.12'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 8.0'
+gem 'rails', '~> 8.1'
 
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '>= 2.1'
@@ -30,7 +30,7 @@ gem 'rack-cors', '~> 3.0'
 gem 'rack-attack', '~> 6.7'
 
 # Model Context Protocol server — exposes the API as agentic tools
-gem 'mcp', '~> 0.25'
+gem 'mcp', '~> 1.2'
 
 # OpenAPI/Swagger docs: rswag-specs generates the spec from request specs;
 # rswag-api serves it and rswag-ui renders the interactive Swagger UI.
@@ -55,7 +55,7 @@ group :development do
   # Ruby code linters:
   gem 'reek', '~> 6.3', require: false
 
-  gem 'rubocop',             '~> 1.60', require: false
+  gem 'rubocop',             '~> 1.89', require: false
   gem 'rubocop-performance', '~> 1.20', require: false
   gem 'rubocop-rails',       '~> 2.23', require: false
   gem 'rubocop-rspec',       '~> 3.0',  require: false
