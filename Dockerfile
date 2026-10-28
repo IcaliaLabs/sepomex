@@ -2,7 +2,7 @@
 # The minimal package dependencies required to run the app in the release image:
 
 # Use the official Ruby 3.4 Slim Bookworm image as base:
-FROM ruby:3.4.7-slim-bookworm AS runtime
+FROM ruby:3.4.12-slim-bookworm AS runtime
 
 # We'll set MALLOC_ARENA_MAX for optimization purposes & prevent memory bloat
 # https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html
