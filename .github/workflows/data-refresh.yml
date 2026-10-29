@@ -20,6 +20,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write # dispatch ci.yml on the refresh PR
 
 concurrency:
   group: data-refresh
@@ -48,6 +49,7 @@ jobs:
           bundle exec rake "data:import_xml[${RUNNER_TEMP}/CPdescarga.xml]"
 
       - name: Open a PR if the dataset changed
+        id: cpr
         uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/refresh-dataset
@@ -61,3 +63,11 @@ jobs:
 
             After merging, the next release image bakes in the new data; to update
             a running/local database, run `bin/rails db:reset && rake data:loadev`.
+
+      - name: Run CI on the refresh PR
+        # Pushes made with GITHUB_TOKEN don't trigger other workflows, so the PR
+        # would get no checks; workflow_dispatch is the exception, so start CI here.
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref chore/refresh-dataset

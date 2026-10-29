@@ -1,12 +1,14 @@
 name: CI
 
 # Runs the test suite, security analysis and lint on every pull request and on
-# pushes to main. This is separate from `ci-and-cd.yml`, which builds and ships
+# pushes to main (and on manual dispatch, which data-refresh.yml uses to test
+# its bot-pushed PRs). This is separate from `ci-and-cd.yml`, which builds and ships
 # the Docker images.
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 # Cancel superseded runs on the same ref (e.g. rapid pushes to a PR).
 concurrency:
@@ -78,6 +80,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             base="${{ github.event.pull_request.base.sha }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            base="origin/main"
           else
             base="${{ github.event.before }}"
           fi
