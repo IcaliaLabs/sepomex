@@ -309,11 +309,11 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    reek (6.5.0)
+    reek (6.6.0)
       dry-schema (~> 1.13)
       logger (~> 1.6)
       parser (~> 3.3.0)
-      rainbow (>= 2.0, < 4.0)
+      rainbow (~> 3.0)
       rexml (~> 3.1)
     regexp_parser (2.13.1)
     reline (0.7.0)
@@ -474,7 +474,7 @@ DEPENDENCIES
   rack-attack (~> 6.7)
   rack-cors (~> 3.0)
   rails (~> 8.1)
-  reek (~> 6.3)
+  reek (~> 6.6)
   rspec-rails (>= 7.1)
   rswag-api (~> 2.13)
   rswag-specs (~> 2.13)
