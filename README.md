@@ -4,7 +4,7 @@
 
 ### The open REST **and** MCP API for Mexico's postal codes
 
-**Every Mexican zip code, state, municipality, city and settlement — one bundled SQLite database, no API key, no rate limit.**
+**Every Mexican zip code, state, municipality, city and settlement — one self-contained SQLite catalog, no API key, no rate limit.**
 
 [![Release](https://img.shields.io/github/v/release/IcaliaLabs/sepomex?color=c2693d&label=release)](https://github.com/IcaliaLabs/sepomex/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/IcaliaLabs/sepomex/ci-and-cd.yml?branch=main&color=c2693d&label=build)](https://github.com/IcaliaLabs/sepomex/actions)
@@ -24,7 +24,7 @@
 
 Looking up a Mexican postal code usually means scraping the official Correos de México site or wrangling a clunky Excel export. Sepomex turns that same official dataset into a clean, paginated JSON API you can query by zip code, state, city, municipality or colony — and, as of v1.0.0, exposes it to AI agents through the **Model Context Protocol** as well.
 
-The whole catalog (~154k settlements) ships **inside the app as a SQLite database**, so there's nothing external to provision: clone, load, run.
+The whole catalog (~154k settlements) travels **with the code**: a CSV in the repo, compiled into a SQLite database at build time. The Docker image ships with it preloaded, so there's nothing external to provision: `docker run` and you're serving.
 
 ## ✨ Features
 
@@ -32,7 +32,7 @@ The whole catalog (~154k settlements) ships **inside the app as a SQLite databas
 - 🧭 **Four resources** — zip codes (settlements), states, municipalities and cities, each with `show` and paginated `index` endpoints.
 - 📄 **Predictable pagination** — every list response carries a `meta.pagination` block plus `Link` / `X-Total-*` headers.
 - 🤖 **MCP server built in** — the same data as agentic tools over Streamable HTTP (`/mcp`) and stdio (`bin/mcp`).
-- 🗃️ **Zero external dependencies** — bundled SQLite dataset; no Postgres, no Redis, no API keys.
+- 🗃️ **Zero external dependencies** — bundled CSV dataset, served from SQLite; no Postgres, no Redis, no API keys.
 - 🌐 **CORS-friendly & read-only** — safe to call straight from the browser.
 - 🐳 **Dockerized** — multi-stage build, one-command dev environment, CI that ships images to Docker Hub.
 
@@ -263,7 +263,7 @@ By default `bin/mcp` uses the development database; set `RAILS_ENV=production` t
 
 ## 🛠️ Development
 
-The dataset lives in a bundled SQLite database, so there's no external service to run. Set up locally with `rbenv`/`ruby` or with Docker.
+The dataset ships as a CSV that loads into a local SQLite database, so there's no external service to run. Set up locally with `rbenv`/`ruby` or with Docker.
 
 **Local (rbenv / ruby)**
 
