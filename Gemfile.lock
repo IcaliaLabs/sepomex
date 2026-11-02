@@ -167,7 +167,7 @@ GEM
       reline (>= 0.4.2)
     jaro_winkler (1.7.0)
     json (3.1.0)
-    json-schema (6.2.0)
+    json-schema (6.2.1)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
     json_schemer (2.5.0)
