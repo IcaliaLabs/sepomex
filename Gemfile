@@ -53,7 +53,7 @@ group :development do
   gem 'bundler-audit', require: false
 
   # Ruby code linters:
-  gem 'reek', '~> 6.3', require: false
+  gem 'reek', '~> 6.6', require: false
 
   gem 'rubocop',             '~> 1.89', require: false
   gem 'rubocop-performance', '~> 1.27', require: false
