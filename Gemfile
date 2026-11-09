@@ -61,7 +61,7 @@ group :development do
   gem 'rubocop-rspec',       '~> 3.0',  require: false
 
   # IDE tools for code completion, inline documentation, and static analysis
-  gem 'solargraph', '~> 0.61', require: false
+  gem 'solargraph', '~> 0.62', require: false
 end
 
 group :test do
