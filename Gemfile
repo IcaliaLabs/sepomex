@@ -41,7 +41,7 @@ gem 'rswag-ui', '~> 2.13'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 group :development, :test do
-  gem 'listen', '~> 3.9'
+  gem 'listen', '~> 3.10'
 
   # Ruby's built-in debugger (replaces byebug / debase / ruby-debug-ide)
   gem 'debug', platforms: %i[mri mingw x64_mingw], require: false
